@@ -21,59 +21,47 @@
 
 package com.sangupta.lineup.queues;
 
-import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.sangupta.lineup.domain.QueueMessage;
+
 
 /**
  * @author sangupta
  *
  */
-public class DuplicateRejectingLineUpQueue implements InternalQueue {
-
+public class DuplicateRejectingLineUpQueue extends AbstractQueue {
+	
+	private final ConcurrentHashMap<String, QueueMessage> myMessages = new ConcurrentHashMap<String, QueueMessage>();
+	
 	/**
-	 * @see com.sangupta.lineup.service.InternalQueue#addMessage(java.lang.String)
+	 * Construct a new queue instance with the given default seconds
+	 * before which the element is available for receiving.
+	 * 
 	 */
-	@Override
-	public QueueMessage addMessage(String message) {
-		// TODO Auto-generated method stub
-		return null;
+	public DuplicateRejectingLineUpQueue(int delaySeconds) {
+		super(delaySeconds);
 	}
-
+	
 	/**
-	 * @see com.sangupta.lineup.service.InternalQueue#addMessage(java.lang.String, int)
+	 * @see com.sangupta.lineup.queues.AbstractQueue#addMessage(java.lang.String, int)
 	 */
 	@Override
 	public QueueMessage addMessage(String message, int delaySeconds) {
-		// TODO Auto-generated method stub
-		return null;
+		QueueMessage qm = QueueMessage.createMessage(message);
+		if(this.QUEUE.contains(qm)) {
+			return this.myMessages.get(message);
+		}
+		
+		return super.addMessage(message, delaySeconds);
 	}
 
 	/**
-	 * @see com.sangupta.lineup.service.InternalQueue#getMessage(int)
+	 * @see com.sangupta.lineup.queues.AbstractQueue#removeMessage(com.sangupta.lineup.domain.QueueMessage)
 	 */
 	@Override
-	public QueueMessage getMessage(int longPollTime) {
-		// TODO Auto-generated method stub
-		return null;
+	protected void removeMessage(QueueMessage queueMessage) {
+		this.myMessages.remove(queueMessage.getBody());
 	}
-
-	/**
-	 * @see com.sangupta.lineup.service.InternalQueue#getMessages(int)
-	 */
-	@Override
-	public List<QueueMessage> getMessages(int numMessages) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * @see com.sangupta.lineup.service.InternalQueue#deleteMessage(java.lang.String)
-	 */
-	@Override
-	public QueueMessage deleteMessage(String messageID) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
 }

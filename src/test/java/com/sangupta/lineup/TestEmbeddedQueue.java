@@ -19,8 +19,9 @@
  * 
  */
 
-package com.sangupta.lineup.queues;
+package com.sangupta.lineup;
 
+import com.sangupta.lineup.domain.LineUpQueue;
 import com.sangupta.lineup.domain.QueueMessage;
 
 
@@ -28,22 +29,23 @@ import com.sangupta.lineup.domain.QueueMessage;
  * @author sangupta
  *
  */
-public class DefaultLineUpQueue extends AbstractQueue {
-	
-	/**
-	 * Default constructor
-	 * 
-	 */
-	public DefaultLineUpQueue(int delaySeconds) {
-		super(delaySeconds);
-	}
+public class TestEmbeddedQueue {
 
-	/**
-	 * @see com.sangupta.lineup.queues.AbstractQueue#removeMessage(com.sangupta.lineup.domain.QueueMessage)
-	 */
-	@Override
-	protected void removeMessage(QueueMessage queueMessage) {
-		// do nothing
+	public static void main(String[] args) throws Exception {
+		 LineUpQueue queue = LineUpService.createMessageQueue("sangupta");
+		 
+		 queue.addMessage("one");
+		 queue.addMessage("two");
+		 
+		 QueueMessage msg = queue.getMessage();
+		 System.out.println(msg.getBody());
+		 
+		 queue.addMessage("three");
+		 
+		 msg = queue.getMessage();
+		 System.out.println(msg.getBody());
+		 
+		 msg = queue.getMessage();
+		 System.out.println(msg.getBody());
 	}
-
 }

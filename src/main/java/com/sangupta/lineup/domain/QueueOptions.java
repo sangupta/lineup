@@ -27,6 +27,16 @@ package com.sangupta.lineup.domain;
  */
 public class QueueOptions {
 	
+	public static final int DEFAULT_DELAY_SECONDS = 0;
+	
+	public static final int DEFAULT_MAX_MESSAGE_SIZE = 65536;
+	
+	public static final int DEFALT_MESSAGE_RETENTION_PERIOD = 30;
+	
+	public static final int DEFAULT_RECEIVE_MESSAGE_WAIT_TIMEOUT = 15;
+	
+	public static final int DEFAULT_VISIBILITY_TIMEOUT = 30;
+	
 	private final int delaySeconds;
 	
 	private final int maximumMessageSize;
@@ -44,7 +54,7 @@ public class QueueOptions {
 	 * 
 	 */
 	public QueueOptions() {
-		this(0, 65536, 30, 15, 30, QueueType.AllowDuplicates);
+		this(DEFAULT_DELAY_SECONDS, DEFAULT_MAX_MESSAGE_SIZE, DEFALT_MESSAGE_RETENTION_PERIOD, DEFAULT_RECEIVE_MESSAGE_WAIT_TIMEOUT, DEFAULT_VISIBILITY_TIMEOUT, QueueType.AllowDuplicates);
 	}
 	
 	/**
@@ -63,6 +73,27 @@ public class QueueOptions {
 		this.receiveMessageWaitTimeSeconds = receiveMessageWaitTimeSeconds;
 		this.visibilityTimeout = visibilityTimeout;
 		this.queueType = queueType;
+	}
+	
+	// static methods follow
+	
+	/**
+	 * Create default queue options.
+	 * 
+	 * @return
+	 */
+	public static QueueOptions getDefaultOptions() {
+		return new QueueOptions();
+	}
+	
+	/**
+	 * Create default queue options for the given queue type.
+	 * 
+	 * @param queueType
+	 * @return
+	 */
+	public static QueueOptions getOptions(QueueType queueType) {
+		return new QueueOptions(DEFAULT_DELAY_SECONDS, DEFAULT_MAX_MESSAGE_SIZE, DEFALT_MESSAGE_RETENTION_PERIOD, DEFAULT_RECEIVE_MESSAGE_WAIT_TIMEOUT, DEFAULT_VISIBILITY_TIMEOUT, queueType);
 	}
 	
 	// Usual accessors follow

@@ -44,7 +44,7 @@ public class DefaultQueueService implements QueueService {
 	 * Internal map that stores all internal {@link LineUpQueue} objects.
 	 * 
 	 */
-	private final ConcurrentHashMap<String, LineUpQueue> myQueues = new ConcurrentHashMap<String, LineUpQueue>();
+	private static final ConcurrentHashMap<String, LineUpQueue> myQueues = new ConcurrentHashMap<String, LineUpQueue>();
 	
 	/**
 	 * Create a new queue with default options.
@@ -74,8 +74,8 @@ public class DefaultQueueService implements QueueService {
 		}
 		
 		LineUpQueue queue = QueueGenerationFactory.getLineUpQueue(name, options);
-		queue = myQueues.putIfAbsent(name, queue);
-		if(queue != null) {
+		LineUpQueue previous = myQueues.putIfAbsent(name, queue);
+		if(previous != null) {
 			throw new QueueAlreadyExistsException();
 		}
 		
@@ -135,12 +135,17 @@ public class DefaultQueueService implements QueueService {
 	 * @see com.sangupta.lineup.service.QueueService#getQueue(java.lang.String)
 	 */
 	@Override
-	public LineUpQueue getQueue(String name) throws QueueNotFoundException {
+	public LineUpQueue getQueue(String name, String securityCode) throws QueueNotFoundException {
 		if(!myQueues.containsKey(name)) {
 			throw new QueueNotFoundException();
 		}
 		
-		return myQueues.get(name);
+		LineUpQueue queue = myQueues.get(name);
+		if(queue.getSecurityCode().equals(securityCode)) {
+			return queue;
+		}
+		
+		throw new SecurityException("The security code does not match");
 	}
 
 }

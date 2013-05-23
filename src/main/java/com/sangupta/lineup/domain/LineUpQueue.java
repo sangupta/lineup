@@ -21,6 +21,7 @@
 
 package com.sangupta.lineup.domain;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.sangupta.lineup.queues.InternalQueue;
@@ -31,14 +32,36 @@ import com.sangupta.lineup.queues.InternalQueue;
  */
 public class LineUpQueue {
 	
+	/**
+	 * The unique name of this queue.
+	 */
 	private final String name;
 	
+	/**
+	 * The security code assigned to this queue.
+	 * 
+	 */
 	private final String securityCode;
 	
+	/**
+	 * The configuration options for this queue.
+	 * 
+	 */
 	private final QueueOptions options;
 	
+	/**
+	 * The backing {@link InternalQueue} implemenation.
+	 * 
+	 */
 	private final InternalQueue internalQueue;
 	
+	/**
+	 * Default constructor.
+	 * 
+	 * @param name
+	 * @param options
+	 * @param internalQueue
+	 */
 	public LineUpQueue(String name, QueueOptions options, InternalQueue internalQueue) {
 		this.name = name;
 		this.options = options;
@@ -46,6 +69,65 @@ public class LineUpQueue {
 		
 		// initialize other params
 		this.securityCode = UUID.randomUUID().toString();
+	}
+	
+	/**
+	 * 
+	 * @param message
+	 * @return
+	 */
+	public QueueMessage addMessage(String message) {
+		return this.internalQueue.addMessage(message);
+	}
+	
+	/**
+	 *  
+	 * @param message
+	 * @param delaySeconds
+	 * @return
+	 */
+	public QueueMessage addMessage(String message, int delaySeconds) {
+		return this.internalQueue.addMessage(message, delaySeconds);
+	}
+	
+	/**
+	 * Return a message from the queue without waiting.
+	 * 
+	 * @return
+	 */
+	public QueueMessage getMessage() {
+		return this.internalQueue.getMessage();
+	}
+	
+	/**
+	 * Return a message from the queue waiting for the given time.
+	 * 
+	 * @param longPollTime
+	 * @return
+	 * @throws InterruptedException 
+	 */
+	public QueueMessage getMessage(int longPollTime) throws InterruptedException {
+		return this.internalQueue.getMessage(longPollTime);
+	}
+	
+	/**
+	 * Return the given number of messages from the queue without waiting.
+	 * 
+	 * @param numMessages
+	 * @return
+	 */
+	public List<QueueMessage> getMessages(int numMessages) {
+		return this.internalQueue.getMessages(numMessages);
+	}
+	
+	/**
+	 * Delete the message with the given identifier.
+	 * 
+	 * @param messageID
+	 * @return
+	 */
+	public boolean deleteMessage(String messageID) {
+		return this.internalQueue.deleteMessage(messageID);
 	}
 	
 	// Usual accessors follow

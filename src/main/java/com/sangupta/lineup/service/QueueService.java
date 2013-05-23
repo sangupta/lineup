@@ -82,6 +82,6 @@ public interface QueueService {
 	 * @return
 	 * @throws QueueNotFoundException 
 	 */
-	public LineUpQueue getQueue(String name) throws QueueNotFoundException;
+	public LineUpQueue getQueue(String name, String securityCode) throws QueueNotFoundException;
 	
 }

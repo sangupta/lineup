@@ -39,7 +39,7 @@ import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
  * @author sangupta
  *
  */
-public class LineUp {
+public class LineUpServer {
 	
 	/**
 	 * 

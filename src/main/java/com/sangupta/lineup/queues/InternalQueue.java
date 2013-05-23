@@ -38,9 +38,8 @@ public interface InternalQueue {
 	 * @return
 	 */
 	public QueueMessage addMessage(String message);
-	
+
 	/**
-	 * Create a new message in the queue with a delayed time as specified
 	 * 
 	 * @param message
 	 * @param delaySeconds
@@ -49,13 +48,20 @@ public interface InternalQueue {
 	public QueueMessage addMessage(String message, int delaySeconds);
 	
 	/**
-	 * Return back a message with the given poll time.
+	 * Return back a message without waiting.
+	 * 
+	 * @return
+	 */
+	public QueueMessage getMessage();
+	
+	/**
 	 * 
 	 * @param longPollTime
 	 * @return
+	 * @throws InterruptedException
 	 */
-	public QueueMessage getMessage(int longPollTime);
-
+	public QueueMessage getMessage(int longPollTime) throws InterruptedException;
+	
 	/**
 	 * Return N number of messages from this queue.
 	 * 
@@ -70,6 +76,6 @@ public interface InternalQueue {
 	 * @param messageID
 	 * @return
 	 */
-	public QueueMessage deleteMessage(String messageID);
+	public boolean deleteMessage(String messageID);
 	
 }

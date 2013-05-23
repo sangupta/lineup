@@ -45,15 +45,15 @@ public class QueueGenerationFactory {
 		InternalQueue internalQueue = null;
 		switch (queueType) {
 			case AllowDuplicates:
-				internalQueue = new DefaultLineUpQueue();
+				internalQueue = new DefaultLineUpQueue(options.getDelaySeconds());
 				break;
 				
 			case PriorityQueue:
-				internalQueue = new PriorityLineUpQueue();
+				internalQueue = new PriorityLineUpQueue(options.getDelaySeconds());
 				break;
 				
 			case RejectDuplicates:
-				internalQueue = new DuplicateRejectingLineUpQueue();
+				internalQueue = new DuplicateRejectingLineUpQueue(options.getDelaySeconds());
 				break;
 		}
 		
