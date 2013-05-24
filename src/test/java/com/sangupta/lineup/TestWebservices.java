@@ -21,14 +21,53 @@
 
 package com.sangupta.lineup;
 
+import com.sangupta.lineup.domain.LineUpQueue;
+import com.sangupta.lineup.domain.QueueMessage;
+import com.sangupta.lineup.server.LineUpServer;
+
 /**
  * @author sangupta
  *
  */
 public class TestWebservices {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
+		final String server = LineUp.BASE_SERVER_URL;
+		final String queueName = "sangupta";
 		
+		// start the server
+		LineUpServer lineUpServer = new LineUpServer(LineUp.BASE_SERVER_URL);
+		
+		try {
+			lineUpServer.startServer();
+			
+			// create a new remote queue
+			LineUpQueue queue = LineUp.createRemoteQueue(server, queueName);
+			
+			// add 3 messages
+			queue.addMessage("one");
+			queue.addMessage("two");
+	
+			// get one message
+			System.out.println(queue.getMessage().getBody());
+			
+			// add another
+			queue.addMessage("three");
+			
+			// pull two more
+			System.out.println(queue.getMessage().getBody());
+			System.out.println(queue.getMessage().getBody());
+			
+			// this should not be found
+			QueueMessage qm = queue.getMessage();
+			if(qm != null) {
+				System.out.println("Failed.");
+			}
+		} catch(Throwable t) {
+			t.printStackTrace();
+		} finally {
+			lineUpServer.stopServer();
+		}
 	}
 
 }

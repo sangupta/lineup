@@ -51,7 +51,7 @@ public class LineUp {
 	/**
 	 * The base server URL
 	 */
-    private static final String baseServerURI = "http://localhost:21000/";
+    public static final String BASE_SERVER_URL = "http://localhost:21000/";
     
     /**
      * Reference to instance that may be currently running
@@ -74,7 +74,7 @@ public class LineUp {
 			return;
 		}
 		
-		lineUpServer = new LineUpServer(baseServerURI);
+		lineUpServer = new LineUpServer(BASE_SERVER_URL);
 		lineUpServer.startServer();
 		
 		System.out.println("LineUp server is now ready to accept connections.");

@@ -23,6 +23,7 @@ package com.sangupta.lineup.web;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -47,6 +48,13 @@ public class QueueWebservice {
 	
 	private QueueService queueService =  new DefaultQueueService();
 	
+//	@GET
+//	@Path("home")
+//	@Produces(MediaType.TEXT_PLAIN)
+//	public String defaultEndPoint() {
+//		return "Available";
+//	}
+	
 	@GET
 	@Path("{queue}")
 	@Produces(MediaType.TEXT_PLAIN)
@@ -58,9 +66,16 @@ public class QueueWebservice {
 		}
 	}
 	
+	@POST
+	@Path("{queue}")
+	@Produces(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML })
+	public DefaultLineUpQueue createPost(@PathParam("queue") String queueName) {
+		return create(queueName);
+	}
+	
 	@PUT
 	@Path("{queue}")
-	@Produces(MediaType.TEXT_XML)
+	@Produces(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML })
 	public DefaultLineUpQueue create(@PathParam("queue") String queueName) {
 		try {
 			return this.queueService.createQueue(queueName);
@@ -71,7 +86,7 @@ public class QueueWebservice {
 	
 	@DELETE
 	@Path("{queue}")
-	@Produces(MediaType.TEXT_XML)
+	@Produces(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML })
 	public boolean delete(@PathParam("queue") String queueName) {
 		try {
 			return this.queueService.deleteQueue(queueName);

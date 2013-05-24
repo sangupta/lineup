@@ -26,11 +26,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.sangupta.jerry.util.AssertUtils;
 import com.sangupta.jerry.util.CryptoUtil;
 import com.sangupta.lineup.queues.PriorityInternalQueue;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * @author sangupta
  *
  */
+@XStreamAlias("queueMessage")
 public class QueueMessage implements Comparable<QueueMessage> {
 	
 	/**
@@ -124,7 +126,7 @@ public class QueueMessage implements Comparable<QueueMessage> {
 	 * @param priority
 	 */
 	public QueueMessage(String body, int delaySeconds, int priority) {
-		this(-1, body, delaySeconds, priority);
+		this(1, body, delaySeconds, priority);
 	}
 
 	/**

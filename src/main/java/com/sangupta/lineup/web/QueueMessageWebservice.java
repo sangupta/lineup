@@ -43,11 +43,12 @@ import com.sangupta.lineup.exceptions.QueueNotFoundException;
  * @author sangupta
  *
  */
+@Path("/messages/")
 public class QueueMessageWebservice {
 	
 	@GET
-	@Path("/queue/{secureCode}/{queue}")
-	@Produces(MediaType.APPLICATION_XML)
+	@Path("{secureCode}/{queue}")
+	@Produces(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML })
 	public Object getMessage(@PathParam("secureCode") String securityCode, @PathParam("queue") String queueName, @DefaultValue("1") @QueryParam("numMessages") int numMessages) { 
 		try {
 			DefaultLineUpQueue queue = LineUp.getQueue(queueName, securityCode);
@@ -67,9 +68,9 @@ public class QueueMessageWebservice {
 	}
 	
 	@POST
-	@Path("/queue/{secureCode}/{queue}")
-	@Produces(MediaType.APPLICATION_XML)
-	@Consumes(MediaType.APPLICATION_XML)
+	@Path("{secureCode}/{queue}")
+	@Produces(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML })
+	@Consumes(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML })
 	public QueueMessage postMessage(@PathParam("secureCode") String securityCode, @PathParam("queue") String queueName, QueueMessage message) {
 		if(message == null) {
 			throw new WebApplicationException(HttpStatusCode.BAD_REQUEST);
@@ -84,9 +85,9 @@ public class QueueMessageWebservice {
 	}
 	
 	@DELETE
-	@Path("/queue/{secureCode}/{queue}")
+	@Path("{secureCode}/{queue}")
 	@Produces(MediaType.TEXT_PLAIN)
-	@Consumes(MediaType.APPLICATION_XML)
+	@Consumes(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML })
 	public String deleteMessage(@PathParam("secureCode") String securityCode, @PathParam("queue") String queueName, QueueMessage message) {
 		if(message == null) {
 			throw new WebApplicationException(HttpStatusCode.BAD_REQUEST);

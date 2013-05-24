@@ -25,11 +25,13 @@ import java.util.List;
 import java.util.UUID;
 
 import com.sangupta.lineup.queues.InternalQueue;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * @author sangupta
  *
  */
+@XStreamAlias("lineupQueue")
 public class DefaultLineUpQueue implements LineUpQueue {
 	
 	/**

@@ -38,6 +38,10 @@ import com.sangupta.jerry.util.XStreamUtils;
  */
 public class RemoteLineUpQueue implements LineUpQueue {
 	
+	/**
+	 * The URL of the remote queue.
+	 * 
+	 */
 	private final String remoteQueue;
 	
 	/**
@@ -61,8 +65,14 @@ public class RemoteLineUpQueue implements LineUpQueue {
 	 * @param queueName
 	 */
 	public RemoteLineUpQueue(String lineUpServer, String queueName) {
-		WebResponse response = WebInvoker.invokeUrl(lineUpServer, WebRequestMethod.PUT);
+		final String endPoint = UriUtils.addWebPaths(lineUpServer, "queue/" + queueName);
+		
+		WebResponse response = WebInvoker.invokeUrl(endPoint, WebRequestMethod.PUT);
 		if(response == null) {
+			throw new RuntimeException("Unable to connect to create a new remote queue.");
+		}
+		
+		if(!response.isSuccess()) {
 			throw new RuntimeException("Unable to connect to create a new remote queue.");
 		}
 
@@ -71,7 +81,7 @@ public class RemoteLineUpQueue implements LineUpQueue {
 			throw new RuntimeException("Unable to connect to create a new remote queue.");
 		}
 		
-		this.remoteQueue = UriUtils.addWebPaths(lineUpServer, "queue/" + queue.getSecurityCode() + "/" + queueName);
+		this.remoteQueue = UriUtils.addWebPaths(lineUpServer, "messages/" + queue.getSecurityCode() + "/" + queueName);
 	}
 	
 	/**
@@ -94,7 +104,7 @@ public class RemoteLineUpQueue implements LineUpQueue {
 			throw new RuntimeException("Unable to connect to create a new remote queue.");
 		}
 		
-		this.remoteQueue = UriUtils.addWebPaths(lineUpServer, "queue/" + queue.getSecurityCode() + "/" + queueName);
+		this.remoteQueue = UriUtils.addWebPaths(lineUpServer, "messages/" + queue.getSecurityCode() + "/" + queueName);
 	}
 	
 	/**
@@ -106,7 +116,7 @@ public class RemoteLineUpQueue implements LineUpQueue {
 	 * @param securityCode
 	 */
 	public RemoteLineUpQueue(String lineUpServer, String queueName, String securityCode) {
-		this.remoteQueue = UriUtils.addWebPaths(lineUpServer, "queue/" + securityCode + "/" + queueName);
+		this.remoteQueue = UriUtils.addWebPaths(lineUpServer, "messages/" + securityCode + "/" + queueName);
 	}
 	
 	/**
@@ -158,7 +168,11 @@ public class RemoteLineUpQueue implements LineUpQueue {
 			return null;
 		}
 		
-		return (QueueMessage) XStreamUtils.getXStream(QueueMessage.class).fromXML(response.asStream());
+		if(response.getResponseCode() == 200) {
+			return (QueueMessage) XStreamUtils.getXStream(QueueMessage.class).fromXML(response.asStream());
+		}
+		
+		return null;
 	}
 
 	/**
