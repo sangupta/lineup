@@ -118,7 +118,7 @@ public abstract class AbstractInternalQueue implements InternalQueue {
 	 * @see com.sangupta.lineup.queues.InternalQueue#getMessage(int)
 	 */
 	@Override
-	public QueueMessage getMessage(int longPollTime) throws InterruptedException {
+	public QueueMessage getMessage(long longPollTime) throws InterruptedException {
 		QueueMessage qm = this.QUEUE.poll(longPollTime, TimeUnit.SECONDS);
 		if(qm != null) {
 			removeMessage(qm);

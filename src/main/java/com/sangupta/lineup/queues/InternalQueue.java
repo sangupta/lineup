@@ -60,7 +60,7 @@ public interface InternalQueue {
 	 * @return
 	 * @throws InterruptedException
 	 */
-	public QueueMessage getMessage(int longPollTime) throws InterruptedException;
+	public QueueMessage getMessage(long longPollTime) throws InterruptedException;
 	
 	/**
 	 * Return N number of messages from this queue.

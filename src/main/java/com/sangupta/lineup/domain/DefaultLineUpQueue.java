@@ -32,7 +32,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("lineupQueue")
-public class DefaultLineUpQueue implements LineUpQueue {
+public class DefaultLineUpQueue extends AbstractLineUpBlockingQueue {
 	
 	/**
 	 * The unique name of this queue.
@@ -127,7 +127,7 @@ public class DefaultLineUpQueue implements LineUpQueue {
 	 * @throws InterruptedException 
 	 */
 	@Override
-	public QueueMessage getMessage(int longPollTime) throws InterruptedException {
+	public QueueMessage getMessage(long longPollTime) throws InterruptedException {
 		return this.internalQueue.getMessage(longPollTime);
 	}
 	

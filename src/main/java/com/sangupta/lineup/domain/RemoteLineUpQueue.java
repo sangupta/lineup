@@ -36,7 +36,7 @@ import com.sangupta.jerry.util.XStreamUtils;
  * @author sangupta
  *
  */
-public class RemoteLineUpQueue implements LineUpQueue {
+public class RemoteLineUpQueue extends AbstractLineUpBlockingQueue {
 	
 	/**
 	 * The URL of the remote queue.
@@ -173,7 +173,7 @@ public class RemoteLineUpQueue implements LineUpQueue {
 	 * @see com.sangupta.lineup.domain.LineUpQueue#getMessage(int)
 	 */
 	@Override
-	public QueueMessage getMessage(int longPollTime) {
+	public QueueMessage getMessage(long longPollTime) {
 		WebResponse response = WebInvoker.getResponse(this.remoteQueue + "?pollTime=" + longPollTime);
 		if(response == null) {
 			return null;
