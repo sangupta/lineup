@@ -22,16 +22,20 @@
 package com.sangupta.lineup.web;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
 import com.sangupta.jerry.http.HttpStatusCode;
-import com.sangupta.lineup.LineUpService;
-import com.sangupta.lineup.domain.LineUpQueue;
+import com.sangupta.lineup.LineUp;
+import com.sangupta.lineup.domain.DefaultLineUpQueue;
 import com.sangupta.lineup.domain.QueueMessage;
 import com.sangupta.lineup.exceptions.QueueNotFoundException;
 
@@ -40,21 +44,65 @@ import com.sangupta.lineup.exceptions.QueueNotFoundException;
  *
  */
 public class QueueMessageWebservice {
-
+	
+	@GET
+	@Path("/queue/{secureCode}/{queue}")
+	@Produces(MediaType.APPLICATION_XML)
+	public Object getMessage(@PathParam("secureCode") String securityCode, @PathParam("queue") String queueName, @DefaultValue("1") @QueryParam("numMessages") int numMessages) { 
+		try {
+			DefaultLineUpQueue queue = LineUp.getQueue(queueName, securityCode);
+			
+			if(numMessages <= 0) {
+				throw new WebApplicationException(HttpStatusCode.BAD_REQUEST);
+			}
+			
+			if(numMessages == 1) {
+				return queue.getMessage();
+			}
+			
+			return queue.getMessages(numMessages);
+		} catch (QueueNotFoundException e) {
+			throw new WebApplicationException(HttpStatusCode.NOT_FOUND);
+		}
+	}
+	
 	@POST
 	@Path("/queue/{secureCode}/{queue}")
 	@Produces(MediaType.APPLICATION_XML)
 	@Consumes(MediaType.APPLICATION_XML)
-	public void postMessage(@PathParam("secureCode") String securityCode, @PathParam("queue") String queueName, QueueMessage message) {
-		LineUpQueue queue = null;
+	public QueueMessage postMessage(@PathParam("secureCode") String securityCode, @PathParam("queue") String queueName, QueueMessage message) {
+		if(message == null) {
+			throw new WebApplicationException(HttpStatusCode.BAD_REQUEST);
+		}
+		
 		try {
-			queue = LineUpService.getQueue(queueName, securityCode);
+			DefaultLineUpQueue queue = LineUp.getQueue(queueName, securityCode);
+			return queue.addMessage(message);
 		} catch (QueueNotFoundException e) {
 			throw new WebApplicationException(HttpStatusCode.NOT_FOUND);
 		}
+	}
+	
+	@DELETE
+	@Path("/queue/{secureCode}/{queue}")
+	@Produces(MediaType.TEXT_PLAIN)
+	@Consumes(MediaType.APPLICATION_XML)
+	public String deleteMessage(@PathParam("secureCode") String securityCode, @PathParam("queue") String queueName, QueueMessage message) {
+		if(message == null) {
+			throw new WebApplicationException(HttpStatusCode.BAD_REQUEST);
+		}
 		
-		// queue will not be null here
-		//return queue.addMessage(message);
+		try {
+			DefaultLineUpQueue queue = LineUp.getQueue(queueName, securityCode);
+			boolean success = queue.deleteMessage(String.valueOf(message.getMessageID()));
+			if(success) {
+				return "done";
+			}
+			
+			throw new WebApplicationException(HttpStatusCode.NOT_MODIFIED);
+		} catch (QueueNotFoundException e) {
+			throw new WebApplicationException(HttpStatusCode.NOT_FOUND);
+		}
 	}
 
 }

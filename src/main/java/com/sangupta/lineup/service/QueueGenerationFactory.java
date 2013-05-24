@@ -21,13 +21,13 @@
 
 package com.sangupta.lineup.service;
 
-import com.sangupta.lineup.domain.LineUpQueue;
+import com.sangupta.lineup.domain.DefaultLineUpQueue;
 import com.sangupta.lineup.domain.QueueOptions;
 import com.sangupta.lineup.domain.QueueType;
-import com.sangupta.lineup.queues.DefaultLineUpQueue;
-import com.sangupta.lineup.queues.DuplicateRejectingLineUpQueue;
+import com.sangupta.lineup.queues.DuplicateAcceptingInternalQueue;
+import com.sangupta.lineup.queues.DuplicateRejectingInternalQueue;
 import com.sangupta.lineup.queues.InternalQueue;
-import com.sangupta.lineup.queues.PriorityLineUpQueue;
+import com.sangupta.lineup.queues.PriorityInternalQueue;
 
 /**
  * @author sangupta
@@ -35,7 +35,7 @@ import com.sangupta.lineup.queues.PriorityLineUpQueue;
  */
 public class QueueGenerationFactory {
 	
-	public static LineUpQueue getLineUpQueue(String name, QueueOptions options) {
+	public static DefaultLineUpQueue getLineUpQueue(String name, QueueOptions options) {
 		final QueueType queueType = options.getQueueType();
 		
 		if(queueType == null) {
@@ -45,19 +45,19 @@ public class QueueGenerationFactory {
 		InternalQueue internalQueue = null;
 		switch (queueType) {
 			case AllowDuplicates:
-				internalQueue = new DefaultLineUpQueue(options.getDelaySeconds());
+				internalQueue = new DuplicateAcceptingInternalQueue(options.getDelaySeconds());
 				break;
 				
 			case PriorityQueue:
-				internalQueue = new PriorityLineUpQueue(options.getDelaySeconds());
+				internalQueue = new PriorityInternalQueue(options.getDelaySeconds());
 				break;
 				
 			case RejectDuplicates:
-				internalQueue = new DuplicateRejectingLineUpQueue(options.getDelaySeconds());
+				internalQueue = new DuplicateRejectingInternalQueue(options.getDelaySeconds());
 				break;
 		}
 		
-		return new LineUpQueue(name, options, internalQueue);
+		return new DefaultLineUpQueue(name, options, internalQueue);
 	}
 
 }

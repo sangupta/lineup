@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.sangupta.jerry.util.AssertUtils;
-import com.sangupta.lineup.domain.LineUpQueue;
+import com.sangupta.lineup.domain.DefaultLineUpQueue;
 import com.sangupta.lineup.domain.QueueOptions;
 import com.sangupta.lineup.exceptions.QueueAlreadyExistsException;
 import com.sangupta.lineup.exceptions.QueueNotFoundException;
@@ -41,17 +41,17 @@ import com.sangupta.lineup.service.QueueService;
 public class DefaultQueueService implements QueueService {
 	
 	/**
-	 * Internal map that stores all internal {@link LineUpQueue} objects.
+	 * Internal map that stores all internal {@link DefaultLineUpQueue} objects.
 	 * 
 	 */
-	private static final ConcurrentHashMap<String, LineUpQueue> myQueues = new ConcurrentHashMap<String, LineUpQueue>();
+	private static final ConcurrentHashMap<String, DefaultLineUpQueue> myQueues = new ConcurrentHashMap<String, DefaultLineUpQueue>();
 	
 	/**
 	 * Create a new queue with default options.
 	 * 
 	 * @see com.sangupta.lineup.service.QueueService#createQueue(java.lang.String)
 	 */
-	public LineUpQueue createQueue(String name) throws QueueAlreadyExistsException {
+	public DefaultLineUpQueue createQueue(String name) throws QueueAlreadyExistsException {
 		return createQueue(name, new QueueOptions());
 	}
 
@@ -60,7 +60,7 @@ public class DefaultQueueService implements QueueService {
 	 * @see com.sangupta.lineup.service.QueueService#createQueue(java.lang.String, com.sangupta.lineup.domain.QueueOptions)
 	 */
 	@Override
-	public LineUpQueue createQueue(String name, QueueOptions options) throws QueueAlreadyExistsException {
+	public DefaultLineUpQueue createQueue(String name, QueueOptions options) throws QueueAlreadyExistsException {
 		if(AssertUtils.isEmpty(name)) {
 			throw new IllegalArgumentException("Queue name cannot be empty");
 		}
@@ -73,8 +73,8 @@ public class DefaultQueueService implements QueueService {
 			throw new QueueAlreadyExistsException();
 		}
 		
-		LineUpQueue queue = QueueGenerationFactory.getLineUpQueue(name, options);
-		LineUpQueue previous = myQueues.putIfAbsent(name, queue);
+		DefaultLineUpQueue queue = QueueGenerationFactory.getLineUpQueue(name, options);
+		DefaultLineUpQueue previous = myQueues.putIfAbsent(name, queue);
 		if(previous != null) {
 			throw new QueueAlreadyExistsException();
 		}
@@ -135,12 +135,12 @@ public class DefaultQueueService implements QueueService {
 	 * @see com.sangupta.lineup.service.QueueService#getQueue(java.lang.String)
 	 */
 	@Override
-	public LineUpQueue getQueue(String name, String securityCode) throws QueueNotFoundException {
+	public DefaultLineUpQueue getQueue(String name, String securityCode) throws QueueNotFoundException {
 		if(!myQueues.containsKey(name)) {
 			throw new QueueNotFoundException();
 		}
 		
-		LineUpQueue queue = myQueues.get(name);
+		DefaultLineUpQueue queue = myQueues.get(name);
 		if(queue.getSecurityCode().equals(securityCode)) {
 			return queue;
 		}

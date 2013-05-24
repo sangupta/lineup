@@ -23,7 +23,7 @@ package com.sangupta.lineup.service;
 
 import java.util.List;
 
-import com.sangupta.lineup.domain.LineUpQueue;
+import com.sangupta.lineup.domain.DefaultLineUpQueue;
 import com.sangupta.lineup.domain.QueueOptions;
 import com.sangupta.lineup.exceptions.QueueAlreadyDeletedException;
 import com.sangupta.lineup.exceptions.QueueAlreadyExistsException;
@@ -38,7 +38,7 @@ import com.sangupta.lineup.exceptions.QueueNotFoundException;
  */
 public interface QueueService {
 	
-	public LineUpQueue createQueue(String name) throws QueueAlreadyExistsException;
+	public DefaultLineUpQueue createQueue(String name) throws QueueAlreadyExistsException;
 	
 	/**
 	 * Create a queue with the given name. Return the queue url that needs to be used when
@@ -48,7 +48,7 @@ public interface QueueService {
 	 * @param options
 	 * @return
 	 */
-	public LineUpQueue createQueue(String name, QueueOptions options) throws QueueAlreadyExistsException;
+	public DefaultLineUpQueue createQueue(String name, QueueOptions options) throws QueueAlreadyExistsException;
 
 	/**
 	 * Delete a queue from the memory.
@@ -82,6 +82,6 @@ public interface QueueService {
 	 * @return
 	 * @throws QueueNotFoundException 
 	 */
-	public LineUpQueue getQueue(String name, String securityCode) throws QueueNotFoundException;
+	public DefaultLineUpQueue getQueue(String name, String securityCode) throws QueueNotFoundException;
 	
 }

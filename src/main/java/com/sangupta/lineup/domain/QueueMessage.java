@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.sangupta.jerry.util.AssertUtils;
 import com.sangupta.jerry.util.CryptoUtil;
-import com.sangupta.lineup.queues.PriorityLineUpQueue;
+import com.sangupta.lineup.queues.PriorityInternalQueue;
 
 /**
  * @author sangupta
@@ -59,7 +59,7 @@ public class QueueMessage implements Comparable<QueueMessage> {
 	private final transient long created;
 	
 	/**
-	 * The priority of this message, in case it being added to the {@link PriorityLineUpQueue}.
+	 * The priority of this message, in case it being added to the {@link PriorityInternalQueue}.
 	 */
 	private final AtomicInteger priority;
 	
@@ -115,6 +115,16 @@ public class QueueMessage implements Comparable<QueueMessage> {
 		}
 
 		return new QueueMessage(-1, null, -1);
+	}
+	
+	/**
+	 * 
+	 * @param body
+	 * @param delaySeconds
+	 * @param priority
+	 */
+	public QueueMessage(String body, int delaySeconds, int priority) {
+		this(-1, body, delaySeconds, priority);
 	}
 
 	/**

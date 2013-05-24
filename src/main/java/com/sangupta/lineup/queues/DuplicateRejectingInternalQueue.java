@@ -21,9 +21,7 @@
 
 package com.sangupta.lineup.queues;
 
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.PriorityBlockingQueue;
 
 import com.sangupta.lineup.domain.QueueMessage;
 
@@ -32,50 +30,38 @@ import com.sangupta.lineup.domain.QueueMessage;
  * @author sangupta
  *
  */
-public class PriorityLineUpQueue extends AbstractQueue {
+public class DuplicateRejectingInternalQueue extends AbstractInternalQueue {
 	
 	private final ConcurrentHashMap<String, QueueMessage> myMessages = new ConcurrentHashMap<String, QueueMessage>();
 	
 	/**
-	 * Construct this queue.
+	 * Construct a new queue instance with the given default seconds
+	 * before which the element is available for receiving.
 	 * 
 	 */
-	public PriorityLineUpQueue(int delaySeconds) {
+	public DuplicateRejectingInternalQueue(int delaySeconds) {
 		super(delaySeconds);
 	}
-
+	
 	/**
-	 * Create a new instance of the backing {@link PriorityBlockingQueue}.
-	 * 
-	 * @see com.sangupta.lineup.queues.AbstractQueue#getBackingQueue()
-	 */
-	protected BlockingQueue<QueueMessage> getBackingQueue() {
-		return new PriorityBlockingQueue<QueueMessage>();
-	}
-
-	/**
-	 * @see com.sangupta.lineup.queues.AbstractQueue#addMessage(java.lang.String, int)
+	 * @see com.sangupta.lineup.queues.AbstractInternalQueue#addMessage(java.lang.String, int)
 	 */
 	@Override
 	public QueueMessage addMessage(String message, int delaySeconds) {
-		if(this.myMessages.containsKey(message)) {
-			// increase its priority
-			QueueMessage qm = this.myMessages.get(message);
-			if(qm != null) {
-				qm.incrementPriority();
-			}
-			
-			return qm;
+		QueueMessage qm = QueueMessage.createMessage(message);
+		if(this.QUEUE.contains(qm)) {
+			return this.myMessages.get(message);
 		}
 		
 		return super.addMessage(message, delaySeconds);
 	}
-	
+
 	/**
-	 * @see com.sangupta.lineup.queues.AbstractQueue#removeMessage(com.sangupta.lineup.domain.QueueMessage)
+	 * @see com.sangupta.lineup.queues.AbstractInternalQueue#removeMessage(com.sangupta.lineup.domain.QueueMessage)
 	 */
 	@Override
 	protected void removeMessage(QueueMessage queueMessage) {
 		this.myMessages.remove(queueMessage.getBody());
 	}
+	
 }

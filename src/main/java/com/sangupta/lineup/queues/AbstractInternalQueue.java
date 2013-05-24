@@ -34,7 +34,7 @@ import com.sangupta.lineup.domain.QueueMessage;
  * @author sangupta
  *
  */
-public abstract class AbstractQueue implements InternalQueue {
+public abstract class AbstractInternalQueue implements InternalQueue {
 	
 	protected final BlockingQueue<QueueMessage> QUEUE;
 	
@@ -43,13 +43,13 @@ public abstract class AbstractQueue implements InternalQueue {
 	protected int delaySeconds;
 	
 	/**
-	 * Create a new instance of this {@link AbstractQueue} with the given value
+	 * Create a new instance of this {@link AbstractInternalQueue} with the given value
 	 * of default seconds to delay before inserting an element into the visible list
 	 * of elements.
 	 * 
 	 * @param delaySeconds
 	 */
-	protected AbstractQueue(int delaySeconds) {
+	protected AbstractInternalQueue(int delaySeconds) {
 		if(delaySeconds < 0) {
 			throw new IllegalArgumentException("Delay seconds cannot be less than zero.");
 		}
@@ -99,7 +99,7 @@ public abstract class AbstractQueue implements InternalQueue {
 		this.QUEUE.offer(queueMessage);
 		return queueMessage;
 	}
-
+	
 	/**
 	 * @see com.sangupta.lineup.queues.InternalQueue#getMessage()
 	 */
@@ -180,5 +180,14 @@ public abstract class AbstractQueue implements InternalQueue {
 	 */
 	protected final QueueMessage createMessage(String message, int delaySeconds) {
 		return new QueueMessage(AUTO_INCREMENTOR.getAndIncrement(), message, delaySeconds, 1);
+	}
+	
+	// Usual accessors follow
+
+	/**
+	 * @param delaySeconds the delaySeconds to set
+	 */
+	public void setDelaySeconds(int delaySeconds) {
+		this.delaySeconds = delaySeconds;
 	}
 }

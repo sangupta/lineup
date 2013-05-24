@@ -28,18 +28,18 @@ import com.sangupta.lineup.domain.QueueMessage;
  * @author sangupta
  *
  */
-public class DefaultLineUpQueue extends AbstractQueue {
+public class DuplicateAcceptingInternalQueue extends AbstractInternalQueue {
 	
 	/**
 	 * Default constructor
 	 * 
 	 */
-	public DefaultLineUpQueue(int delaySeconds) {
+	public DuplicateAcceptingInternalQueue(int delaySeconds) {
 		super(delaySeconds);
 	}
 
 	/**
-	 * @see com.sangupta.lineup.queues.AbstractQueue#removeMessage(com.sangupta.lineup.domain.QueueMessage)
+	 * @see com.sangupta.lineup.queues.AbstractInternalQueue#removeMessage(com.sangupta.lineup.domain.QueueMessage)
 	 */
 	@Override
 	protected void removeMessage(QueueMessage queueMessage) {

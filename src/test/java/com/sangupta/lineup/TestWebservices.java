@@ -19,28 +19,16 @@
  * 
  */
 
-package com.sangupta.lineup.domain;
-
-import java.util.List;
+package com.sangupta.lineup;
 
 /**
  * @author sangupta
  *
  */
-public interface LineUpQueue {
-	
-	public QueueMessage addMessage(String message);
-	
-	public QueueMessage addMessage(String message, int delaySeconds);
-	
-	public QueueMessage addMessage(QueueMessage qm);
-	
-	public QueueMessage getMessage();
-	
-	public QueueMessage getMessage(int longPollTime) throws InterruptedException;
-	
-	public List<QueueMessage> getMessages(int numMessages);
-	
-	public boolean deleteMessage(String messageID);
+public class TestWebservices {
+
+	public static void main(String[] args) {
+		
+	}
 
 }

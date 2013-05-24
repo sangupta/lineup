@@ -31,7 +31,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
 import com.sangupta.jerry.http.HttpStatusCode;
-import com.sangupta.lineup.domain.LineUpQueue;
+import com.sangupta.lineup.domain.DefaultLineUpQueue;
 import com.sangupta.lineup.exceptions.QueueAlreadyDeletedException;
 import com.sangupta.lineup.exceptions.QueueAlreadyExistsException;
 import com.sangupta.lineup.exceptions.QueueNotFoundException;
@@ -61,7 +61,7 @@ public class QueueWebservice {
 	@PUT
 	@Path("{queue}")
 	@Produces(MediaType.TEXT_XML)
-	public LineUpQueue create(@PathParam("queue") String queueName) {
+	public DefaultLineUpQueue create(@PathParam("queue") String queueName) {
 		try {
 			return this.queueService.createQueue(queueName);
 		} catch (QueueAlreadyExistsException e) {
