@@ -21,6 +21,8 @@
 
 package com.sangupta.lineup.domain;
 
+import com.sangupta.jerry.util.AssertUtils;
+
 /**
  * @author sangupta
  *
@@ -32,5 +34,29 @@ public enum QueueType {
 	RejectDuplicates,
 	
 	PriorityQueue;
+
+	/**
+	 * @param queueType
+	 * @return
+	 */
+	public static QueueType fromString(String queueType) {
+		if(AssertUtils.isEmpty(queueType)) {
+			return null;
+		}
+		
+		queueType = queueType.toLowerCase();
+		
+		if(AllowDuplicates.toString().toLowerCase().equals(queueType)) {
+			return AllowDuplicates;
+		}
+		
+		if(RejectDuplicates.toString().toLowerCase().equals(queueType)) {
+			return RejectDuplicates;
+		}
+		if(PriorityQueue.toString().toLowerCase().equals(queueType)) {
+			return PriorityQueue;
+		}
+		return null;
+	}
 
 }

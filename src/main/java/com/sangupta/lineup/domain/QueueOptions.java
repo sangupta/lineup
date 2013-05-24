@@ -21,10 +21,13 @@
 
 package com.sangupta.lineup.domain;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  * @author sangupta
  *
  */
+@XStreamAlias("queueOptions")
 public class QueueOptions {
 	
 	public static final int DEFAULT_DELAY_SECONDS = 0;

@@ -22,17 +22,22 @@
 package com.sangupta.lineup.web;
 
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
 import com.sangupta.jerry.http.HttpStatusCode;
+import com.sangupta.jerry.util.AssertUtils;
 import com.sangupta.lineup.domain.DefaultLineUpQueue;
+import com.sangupta.lineup.domain.QueueOptions;
+import com.sangupta.lineup.domain.QueueType;
 import com.sangupta.lineup.exceptions.QueueAlreadyDeletedException;
 import com.sangupta.lineup.exceptions.QueueAlreadyExistsException;
 import com.sangupta.lineup.exceptions.QueueNotFoundException;
@@ -48,13 +53,6 @@ public class QueueWebservice {
 	
 	private QueueService queueService =  new DefaultQueueService();
 	
-//	@GET
-//	@Path("home")
-//	@Produces(MediaType.TEXT_PLAIN)
-//	public String defaultEndPoint() {
-//		return "Available";
-//	}
-	
 	@GET
 	@Path("{queue}")
 	@Produces(MediaType.TEXT_PLAIN)
@@ -69,16 +67,26 @@ public class QueueWebservice {
 	@POST
 	@Path("{queue}")
 	@Produces(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML })
-	public DefaultLineUpQueue createPost(@PathParam("queue") String queueName) {
-		return create(queueName);
+	public DefaultLineUpQueue createPost(@PathParam("queue") String queueName, @DefaultValue("") @QueryParam("queueType") String queueType) {
+		return create(queueName, queueType);
 	}
 	
 	@PUT
 	@Path("{queue}")
 	@Produces(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML })
-	public DefaultLineUpQueue create(@PathParam("queue") String queueName) {
+	public DefaultLineUpQueue create(@PathParam("queue") String queueName, @DefaultValue("") @QueryParam("queueType") String queueType) {
 		try {
-			return this.queueService.createQueue(queueName);
+			if(AssertUtils.isEmpty(queueType)) {
+				return this.queueService.createQueue(queueName);
+			}
+			
+			// try and decipher the type
+			QueueType type = QueueType.fromString(queueType);
+			if(type == null) {
+				throw new WebApplicationException(HttpStatusCode.BAD_REQUEST);
+			}
+			
+			return this.queueService.createQueue(queueName, QueueOptions.getOptions(type));
 		} catch (QueueAlreadyExistsException e) {
 			throw new WebApplicationException(HttpStatusCode.CONFLICT);
 		}

@@ -26,6 +26,8 @@ import java.io.IOException;
 import com.sangupta.jerry.util.ConsoleUtils;
 import com.sangupta.lineup.domain.DefaultLineUpQueue;
 import com.sangupta.lineup.domain.LineUpQueue;
+import com.sangupta.lineup.domain.QueueOptions;
+import com.sangupta.lineup.domain.QueueType;
 import com.sangupta.lineup.domain.RemoteLineUpQueue;
 import com.sangupta.lineup.exceptions.QueueAlreadyDeletedException;
 import com.sangupta.lineup.exceptions.QueueAlreadyExistsException;
@@ -144,6 +146,18 @@ public class LineUp {
 	 */
 	public static LineUpQueue createRemoteQueue(final String lineUpServer, final String queueName) {
 		return new RemoteLineUpQueue(lineUpServer, queueName);
+	}
+	
+	/**
+	 * Create a remote queue at the given server address and queue name.
+	 * 
+	 * @param lineUpServer
+	 * @param queueName
+	 * @param queueType
+	 * @return
+	 */
+	public static LineUpQueue createRemoteQueue(final String lineUpServer, final String queueName, final QueueType queueType) {
+		return new RemoteLineUpQueue(lineUpServer, queueName, QueueOptions.getOptions(queueType));
 	}
 	
 	/**

@@ -68,7 +68,15 @@ public class PriorityInternalQueue extends AbstractInternalQueue {
 			return qm;
 		}
 		
-		return super.addMessage(message, delaySeconds);
+		QueueMessage qm = super.addMessage(message, delaySeconds);
+		if(qm != null) {
+			QueueMessage older = this.myMessages.putIfAbsent(message, qm);
+			if(older != null) {
+				older.incrementPriority();
+			}
+		}
+		
+		return qm;
 	}
 	
 	/**

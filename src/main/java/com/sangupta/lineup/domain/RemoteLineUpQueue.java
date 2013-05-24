@@ -65,23 +65,7 @@ public class RemoteLineUpQueue implements LineUpQueue {
 	 * @param queueName
 	 */
 	public RemoteLineUpQueue(String lineUpServer, String queueName) {
-		final String endPoint = UriUtils.addWebPaths(lineUpServer, "queue/" + queueName);
-		
-		WebResponse response = WebInvoker.invokeUrl(endPoint, WebRequestMethod.PUT);
-		if(response == null) {
-			throw new RuntimeException("Unable to connect to create a new remote queue.");
-		}
-		
-		if(!response.isSuccess()) {
-			throw new RuntimeException("Unable to connect to create a new remote queue.");
-		}
-
-		DefaultLineUpQueue queue = (DefaultLineUpQueue) XStreamUtils.getXStream(DefaultLineUpQueue.class).fromXML(response.asStream());
-		if(queue == null) {
-			throw new RuntimeException("Unable to connect to create a new remote queue.");
-		}
-		
-		this.remoteQueue = UriUtils.addWebPaths(lineUpServer, "messages/" + queue.getSecurityCode() + "/" + queueName);
+		this(lineUpServer, queueName, QueueOptions.getOptions(QueueType.AllowDuplicates));
 	}
 	
 	/**
@@ -93,12 +77,22 @@ public class RemoteLineUpQueue implements LineUpQueue {
 	 * @param queueOptions
 	 */
 	public RemoteLineUpQueue(String lineUpServer, String queueName, QueueOptions queueOptions) {
+		if(queueOptions == null) {
+			throw new IllegalArgumentException("Queue options cannot be null");
+		}
+		
 		final String xml = XStreamUtils.getXStream(QueueOptions.class).toXML(queueOptions);
-		WebResponse response = WebInvoker.invokeUrl(lineUpServer, WebRequestMethod.PUT, MediaType.TEXT_XML, xml);
+		final String endPoint = UriUtils.addWebPaths(lineUpServer, "queue/" + queueName + "?queueType=" + queueOptions.getQueueType());
+		
+		WebResponse response = WebInvoker.invokeUrl(endPoint, WebRequestMethod.PUT, MediaType.TEXT_XML, xml);
 		if(response == null) {
 			throw new RuntimeException("Unable to connect to create a new remote queue.");
 		}
 
+		if(response.getResponseCode() != 200) {
+			throw new RuntimeException("Unable to connect to create a new remote queue."); 
+		}
+		
 		DefaultLineUpQueue queue = (DefaultLineUpQueue) XStreamUtils.getXStream(DefaultLineUpQueue.class).fromXML(response.asStream());
 		if(queue == null) {
 			throw new RuntimeException("Unable to connect to create a new remote queue.");
