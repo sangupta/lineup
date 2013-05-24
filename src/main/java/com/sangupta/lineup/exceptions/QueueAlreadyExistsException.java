@@ -22,6 +22,8 @@
 package com.sangupta.lineup.exceptions;
 
 /**
+ * Signals that the queue already exists on the server.
+ * 
  * @author sangupta
  *
  */

@@ -22,6 +22,8 @@
 package com.sangupta.lineup.exceptions;
 
 /**
+ * Signals that we were unable to locate the requested queue.
+ * 
  * @author sangupta
  *
  */

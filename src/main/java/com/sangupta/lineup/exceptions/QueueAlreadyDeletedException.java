@@ -22,6 +22,8 @@
 package com.sangupta.lineup.exceptions;
 
 /**
+ * Signals that the queue has already been deleted.
+ * 
  * @author sangupta
  *
  */
@@ -31,5 +33,5 @@ public class QueueAlreadyDeletedException extends Exception {
 	 * Generated via Eclipse
 	 */
 	private static final long serialVersionUID = -7907431024682216530L;
-
+	
 }
