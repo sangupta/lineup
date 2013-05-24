@@ -7,7 +7,7 @@
 	<packaging>jar</packaging>
 
 	<name>lineup</name>
-	<description></description>
+	<description>In-Memory high-throughput queue</description>
 	<url>http://www.sangupta.com/projects/lineup.html</url>
 	<inceptionYear>2013</inceptionYear>
 
@@ -83,6 +83,7 @@
 	</dependencies>
 	
 	<build>
+		<finalName>lineup</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
