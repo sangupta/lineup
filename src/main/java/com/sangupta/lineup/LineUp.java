@@ -38,7 +38,7 @@ import com.sangupta.lineup.service.impl.DefaultQueueService;
 
 /**
  * Utility class to help use <strong>LineUp</strong> framework
- * in the embedded mode.
+ * in the various modes.
  * 
  * @author sangupta
  *
@@ -60,7 +60,8 @@ public class LineUp {
      */
     private static LineUpServer lineUpServer = null;
 
-    /**0
+    /**
+     * Main function that starts the {@link LineUpServer}.
      * 
      * @param args
      * @throws IOException 
@@ -169,7 +170,7 @@ public class LineUp {
 	 * @param securityCode
 	 * @return
 	 */
-	public static LineUpQueue createRemoteQueue(final String lineUpServer, final String queueName, final String securityCode) {
+	public static LineUpQueue connectRemote(final String lineUpServer, final String queueName, final String securityCode) {
 		return new RemoteLineUpQueue(lineUpServer, queueName, securityCode);
 	}
 	
