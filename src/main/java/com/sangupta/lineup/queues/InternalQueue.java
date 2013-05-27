@@ -78,4 +78,11 @@ public interface InternalQueue {
 	 */
 	public boolean deleteMessage(String messageID);
 	
+	/**
+	 * Return the current size of the queue.
+	 * 
+	 * @return
+	 */
+	public int size();
+	
 }

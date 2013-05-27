@@ -153,6 +153,14 @@ public class DefaultLineUpQueue extends AbstractLineUpBlockingQueue {
 		return this.internalQueue.deleteMessage(messageID);
 	}
 	
+	/**
+	 * @see com.sangupta.lineup.domain.LineUpQueue#numMessages()
+	 */
+	@Override
+	public int numMessages() {
+		return this.internalQueue.size();
+	}
+
 	// Usual accessors follow
 
 	/**

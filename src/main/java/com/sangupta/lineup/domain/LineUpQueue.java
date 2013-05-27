@@ -31,18 +31,70 @@ import java.util.concurrent.BlockingQueue;
  */
 public interface LineUpQueue extends BlockingQueue<QueueMessage> {
 	
+	/**
+	 * Add a message to the internal queue.
+	 * 
+	 * @param message
+	 * @return
+	 */
 	public QueueMessage addMessage(String message);
 	
+	/**
+	 * Add a message to the internal queue.
+	 * 
+	 * @param message
+	 * @param delaySeconds
+	 * @return
+	 */
 	public QueueMessage addMessage(String message, int delaySeconds);
 	
+	/**
+	 * Add a message to the internal queue.
+	 * 
+	 * @param queueMessage
+	 * @return
+	 */
 	public QueueMessage addMessage(QueueMessage queueMessage);
 	
+	/**
+	 * Return a message from the queue, without waiting. Returns <code>null</code>
+	 * if the queue is currently empty.
+	 * 
+	 * @return
+	 */
 	public QueueMessage getMessage();
 	
+	/**
+	 * Return a message from the queue, waiting for the specified poll time
+	 * before returning <code>null</code>.
+	 * 
+	 * @param longPollTime
+	 * @return
+	 * @throws InterruptedException
+	 */
 	public QueueMessage getMessage(long longPollTime) throws InterruptedException;
 	
+	/**
+	 * Return given number of messages from the queue.
+	 * 
+	 * @param numMessages
+	 * @return
+	 */
 	public List<QueueMessage> getMessages(int numMessages);
 	
+	/**
+	 * Delete the message with the given identifier from the queue.
+	 * 
+	 * @param messageID
+	 * @return
+	 */
 	public boolean deleteMessage(String messageID);
+	
+	/**
+	 * Returns the number of messages in the queue.
+	 * 
+	 * @return
+	 */
+	public int numMessages();
 
 }

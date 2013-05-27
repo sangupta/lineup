@@ -81,8 +81,7 @@ public abstract class AbstractLineUpBlockingQueue implements LineUpQueue {
 	 */
 	@Override
 	public int size() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.numMessages();
 	}
 
 	/**

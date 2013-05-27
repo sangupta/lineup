@@ -215,4 +215,12 @@ public class RemoteLineUpQueue extends AbstractLineUpBlockingQueue {
 		return false;
 	}
 
+	/**
+	 * @see com.sangupta.lineup.domain.LineUpQueue#numMessages()
+	 */
+	@Override
+	public int numMessages() {
+		throw new RuntimeException("Not yet implemented");
+	}
+
 }

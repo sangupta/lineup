@@ -43,6 +43,19 @@ public abstract class AbstractInternalQueue implements InternalQueue {
 	protected int delaySeconds;
 	
 	/**
+	 * Count the number of messages in the queue.
+	 * 
+	 * @see com.sangupta.lineup.queues.InternalQueue#size()
+	 */
+	public int size() {
+		if(QUEUE != null) {
+			return QUEUE.size();
+		}
+		
+		return 0;
+	}
+	
+	/**
 	 * Create a new instance of this {@link AbstractInternalQueue} with the given value
 	 * of default seconds to delay before inserting an element into the visible list
 	 * of elements.
