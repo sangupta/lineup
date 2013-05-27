@@ -39,19 +39,19 @@ import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 public class LineUpServer {
 
 	/**
-	 * 
+	 * Default webservices packages to load  
 	 */
 	private static final String DEFAULT_WEBSERVICES_PACKAGES = "com.sangupta.lineup com.sangupta.jerry.jersey";
 
-	private final Map<String, String> initParams;
-	
-	static {
-	}
-	
 	/**
 	 * The server URL where we will hook up.
 	 */
 	private final String serverURL;
+	
+	/**
+	 * Initialization parameters for grizzly container
+	 */
+	private final Map<String, String> initParams;
 	
 	/**
 	 * Keeps track of whether the server is running or not.
@@ -59,6 +59,9 @@ public class LineUpServer {
 	 */
 	private volatile boolean started = false;
 	
+	/**
+	 * The thread selector obtained from Grizzly container
+	 */
     private SelectorThread threadSelector = null;
     
     /**
@@ -85,9 +88,9 @@ public class LineUpServer {
 		}
 		
 		this.serverURL = serverURL;
-		this.initParams = new HashMap<String, String>();
+		initParams = new HashMap<String, String>();
 		
-		if(AssertUtils.isNotEmpty(customJerseyWebservices)) {
+		if(AssertUtils.isEmpty(customJerseyWebservices)) {
 			initParams.put("com.sun.jersey.config.property.packages", DEFAULT_WEBSERVICES_PACKAGES);
 		} else {
 			final StringBuilder packages = new StringBuilder(DEFAULT_WEBSERVICES_PACKAGES);
