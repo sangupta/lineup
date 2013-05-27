@@ -105,7 +105,8 @@ public class DefaultQueueService implements QueueService {
 			throw new QueueNotFoundException();
 		}
 		
-		return name;
+		DefaultLineUpQueue queue = myQueues.get(name);
+		return queue.getSecurityCode() + "/" + queue.getName();
 	}
 
 	/**
