@@ -22,11 +22,11 @@
 package com.sangupta.lineup.service;
 
 import com.sangupta.lineup.domain.DefaultLineUpQueue;
+import com.sangupta.lineup.domain.DefaultPriorityLineUpQueue;
 import com.sangupta.lineup.domain.QueueOptions;
 import com.sangupta.lineup.domain.QueueType;
 import com.sangupta.lineup.queues.DuplicateAcceptingInternalQueue;
 import com.sangupta.lineup.queues.DuplicateRejectingInternalQueue;
-import com.sangupta.lineup.queues.InternalQueue;
 import com.sangupta.lineup.queues.PriorityInternalQueue;
 
 /**
@@ -42,22 +42,18 @@ public class QueueGenerationFactory {
 			throw new IllegalArgumentException("Queue type cannot be null");
 		}
 		
-		InternalQueue internalQueue = null;
 		switch (queueType) {
 			case AllowDuplicates:
-				internalQueue = new DuplicateAcceptingInternalQueue(options.getDelaySeconds());
-				break;
+				return new DefaultLineUpQueue(name, options, new DuplicateAcceptingInternalQueue(options.getDelaySeconds()));
 				
 			case PriorityQueue:
-				internalQueue = new PriorityInternalQueue(options.getDelaySeconds());
-				break;
+				return new DefaultPriorityLineUpQueue(name, options, new PriorityInternalQueue(options.getDelaySeconds()));
 				
 			case RejectDuplicates:
-				internalQueue = new DuplicateRejectingInternalQueue(options.getDelaySeconds());
-				break;
+				return new DefaultLineUpQueue(name, options, new DuplicateRejectingInternalQueue(options.getDelaySeconds()));
 		}
 		
-		return new DefaultLineUpQueue(name, options, internalQueue);
+		throw new IllegalArgumentException("Queue type is neither null/nor recognized by the system");
 	}
 
 }

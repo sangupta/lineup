@@ -110,7 +110,7 @@ public class LineUp {
 	 * @return
 	 * @throws QueueAlreadyExistsException 
 	 */
-	public static LineUpQueue createMessageQueue(String name) throws QueueAlreadyExistsException {
+	public static DefaultLineUpQueue createMessageQueue(String name) throws QueueAlreadyExistsException {
 		return QUEUE_SERVICE.createQueue(name);
 	}
 	
@@ -122,7 +122,7 @@ public class LineUp {
 	 * @return
 	 * @throws QueueAlreadyExistsException
 	 */
-	public static LineUpQueue createMessageQueue(String name, QueueType queueType) throws QueueAlreadyExistsException {
+	public static DefaultLineUpQueue createMessageQueue(String name, QueueType queueType) throws QueueAlreadyExistsException {
 		return QUEUE_SERVICE.createQueue(name, QueueOptions.getOptions(queueType));
 	}
 	
