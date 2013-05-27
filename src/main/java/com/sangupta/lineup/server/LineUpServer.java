@@ -25,19 +25,27 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.sangupta.jerry.util.AssertUtils;
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 
 /**
+ * A Grizzly based webserver that can accept REST based incoming
+ * connections for operations on message queues.
+ * 
  * @author sangupta
  *
  */
 public class LineUpServer {
 
-	private static final Map<String, String> initParams = new HashMap<String, String>();
+	/**
+	 * 
+	 */
+	private static final String DEFAULT_WEBSERVICES_PACKAGES = "com.sangupta.lineup com.sangupta.jerry.jersey";
+
+	private final Map<String, String> initParams;
 	
 	static {
-		initParams.put("com.sun.jersey.config.property.packages", "com.sangupta.lineup com.sangupta.jerry.jersey");
 	}
 	
 	/**
@@ -53,8 +61,43 @@ public class LineUpServer {
 	
     private SelectorThread threadSelector = null;
     
+    /**
+     * Create a new {@link LineUpServer} instance with default
+     * webservices.
+     * 
+     * @param serverURL
+     */
 	public LineUpServer(String serverURL) {
+		this(serverURL, null);
+	}
+	
+	/**
+	 * Create a new {@link LineUpServer} instance also loading
+	 * custom webservices from the package provided. The webservices
+	 * must be Jersey-enabled to work properly.
+	 * 
+	 * @param serverURL
+	 * @param customJerseyWebservices
+	 */
+	public LineUpServer(final String serverURL, final String[] customJerseyWebservices) {
+		if(AssertUtils.isEmpty(serverURL)) {
+			throw new IllegalArgumentException("Server URL must be provided, cannot be null/empty");
+		}
+		
 		this.serverURL = serverURL;
+		this.initParams = new HashMap<String, String>();
+		
+		if(AssertUtils.isNotEmpty(customJerseyWebservices)) {
+			initParams.put("com.sun.jersey.config.property.packages", DEFAULT_WEBSERVICES_PACKAGES);
+		} else {
+			final StringBuilder packages = new StringBuilder(DEFAULT_WEBSERVICES_PACKAGES);
+			for(String customPackage : customJerseyWebservices) {
+				packages.append(' ');
+				packages.append(customPackage);
+			}
+			
+			initParams.put("com.sun.jersey.config.property.packages", packages.toString());
+		}
 	}
 	
 	/**
