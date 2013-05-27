@@ -93,6 +93,15 @@ public class LineUp {
 		System.out.println("LineUp server has now stopped.");
 	}
     
+    /**
+     * Return the default instance of the queue service.
+     * 
+     * @return
+     */
+    public static QueueService getDefaultQueueService() {
+    	return QUEUE_SERVICE;
+    }
+    
 	/**
 	 * Get a new queue with default options or retrieve an existing queue
 	 * with whatever options that were provided.
@@ -101,8 +110,20 @@ public class LineUp {
 	 * @return
 	 * @throws QueueAlreadyExistsException 
 	 */
-	public static DefaultLineUpQueue createMessageQueue(String name) throws QueueAlreadyExistsException {
+	public static LineUpQueue createMessageQueue(String name) throws QueueAlreadyExistsException {
 		return QUEUE_SERVICE.createQueue(name);
+	}
+	
+	/**
+	 * Get a new queue with default options but of the given type.
+	 * 
+	 * @param name
+	 * @param queueType
+	 * @return
+	 * @throws QueueAlreadyExistsException
+	 */
+	public static LineUpQueue createMessageQueue(String name, QueueType queueType) throws QueueAlreadyExistsException {
+		return QUEUE_SERVICE.createQueue(name, QueueOptions.getOptions(queueType));
 	}
 	
 	/**
