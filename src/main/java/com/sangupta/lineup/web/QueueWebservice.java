@@ -35,6 +35,7 @@ import javax.ws.rs.core.MediaType;
 
 import com.sangupta.jerry.http.HttpStatusCode;
 import com.sangupta.jerry.util.AssertUtils;
+import com.sangupta.lineup.LineUp;
 import com.sangupta.lineup.domain.DefaultLineUpQueue;
 import com.sangupta.lineup.domain.QueueOptions;
 import com.sangupta.lineup.domain.QueueType;
@@ -42,7 +43,6 @@ import com.sangupta.lineup.exceptions.QueueAlreadyDeletedException;
 import com.sangupta.lineup.exceptions.QueueAlreadyExistsException;
 import com.sangupta.lineup.exceptions.QueueNotFoundException;
 import com.sangupta.lineup.service.QueueService;
-import com.sangupta.lineup.service.impl.DefaultQueueService;
 
 /**
  * @author sangupta
@@ -51,7 +51,11 @@ import com.sangupta.lineup.service.impl.DefaultQueueService;
 @Path("/queue/")
 public class QueueWebservice {
 	
-	private QueueService queueService =  new DefaultQueueService();
+	/**
+	 * Get the default queue service to be used.
+	 * 
+	 */
+	private QueueService queueService =  LineUp.getDefaultQueueService();
 	
 	@GET
 	@Path("{queue}")

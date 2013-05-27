@@ -21,7 +21,7 @@
 
 package com.sangupta.lineup;
 
-import com.sangupta.lineup.domain.DefaultLineUpQueue;
+import com.sangupta.lineup.domain.LineUpQueue;
 import com.sangupta.lineup.domain.QueueMessage;
 
 
@@ -32,7 +32,7 @@ import com.sangupta.lineup.domain.QueueMessage;
 public class TestEmbeddedQueue {
 
 	public static void main(String[] args) throws Exception {
-		 DefaultLineUpQueue queue = LineUp.createMessageQueue("sangupta");
+		 LineUpQueue queue = LineUp.createMessageQueue("sangupta");
 		 
 		 queue.addMessage("one");
 		 queue.addMessage("two");
