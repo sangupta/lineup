@@ -49,22 +49,55 @@ public class QueueMessageWebservice {
 	@GET
 	@Path("{secureCode}/{queue}")
 	@Produces(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML })
-	public Object getMessage(@PathParam("secureCode") String securityCode, @PathParam("queue") String queueName, @DefaultValue("1") @QueryParam("numMessages") int numMessages) { 
+	public Object getMessage(@PathParam("secureCode") String securityCode, @PathParam("queue") String queueName, 
+			@DefaultValue("1") @QueryParam("numMessages") int numMessages, @DefaultValue("0") @QueryParam("pollTime") long pollTime) {
+		
+		DefaultLineUpQueue queue;
 		try {
-			DefaultLineUpQueue queue = LineUp.getQueue(queueName, securityCode);
-			
-			if(numMessages <= 0) {
-				throw new WebApplicationException(HttpStatusCode.BAD_REQUEST);
-			}
-			
-			if(numMessages == 1) {
+			queue = LineUp.getQueue(queueName, securityCode);
+		} catch (QueueNotFoundException e) {
+			throw new WebApplicationException(HttpStatusCode.BAD_REQUEST);
+		}
+		
+		if(queue == null) {
+			throw new WebApplicationException(HttpStatusCode.BAD_REQUEST);
+		}
+
+		if(numMessages <= 0) {
+			throw new WebApplicationException(HttpStatusCode.BAD_REQUEST);
+		}
+		
+		Object messages = getMessageFromQueue(queue, numMessages, pollTime);
+		if(messages == null) {
+			throw new WebApplicationException(HttpStatusCode.NOT_FOUND);
+		}
+		
+		return messages;
+	}
+	
+	/**
+	 * 
+	 * @param queue
+	 * @param numMessages
+	 * @param pollTime
+	 * @return
+	 */
+	private Object getMessageFromQueue(DefaultLineUpQueue queue, int numMessages, long pollTime) {
+		pollTime = 0;
+		
+		if(numMessages == 1) {
+			if(pollTime == 0) {
 				return queue.getMessage();
 			}
 			
-			return queue.getMessages(numMessages);
-		} catch (QueueNotFoundException e) {
-			throw new WebApplicationException(HttpStatusCode.NOT_FOUND);
+			try {
+				return queue.getMessage(pollTime);
+			} catch (InterruptedException e) {
+				return null;
+			}
 		}
+			
+		return queue.getMessages(numMessages);
 	}
 	
 	@POST

@@ -29,6 +29,7 @@ import com.sangupta.jerry.http.WebInvoker;
 import com.sangupta.jerry.http.WebRequestMethod;
 import com.sangupta.jerry.http.WebResponse;
 import com.sangupta.jerry.util.AssertUtils;
+import com.sangupta.jerry.util.DateUtils;
 import com.sangupta.jerry.util.UriUtils;
 import com.sangupta.jerry.util.XStreamUtils;
 
@@ -157,16 +158,7 @@ public class RemoteLineUpQueue extends AbstractLineUpBlockingQueue {
 	 */
 	@Override
 	public QueueMessage getMessage() {
-		WebResponse response = WebInvoker.getResponse(this.remoteQueue);
-		if(response == null) {
-			return null;
-		}
-		
-		if(response.getResponseCode() == 200) {
-			return (QueueMessage) XStreamUtils.getXStream(QueueMessage.class).fromXML(response.asStream());
-		}
-		
-		return null;
+		return getMessage(DateUtils.FIVE_MINUTES);
 	}
 
 	/**
@@ -179,7 +171,15 @@ public class RemoteLineUpQueue extends AbstractLineUpBlockingQueue {
 			return null;
 		}
 		
-		return (QueueMessage) XStreamUtils.getXStream(QueueMessage.class).fromXML(response.asStream());
+		if(response.getResponseCode() == 200) {
+			return (QueueMessage) XStreamUtils.getXStream(QueueMessage.class).fromXML(response.asStream());
+		}
+		
+		// consume the entity so that the connection can be closed
+		response.close();
+		
+		// return null
+		return null;
 	}
 
 	/**

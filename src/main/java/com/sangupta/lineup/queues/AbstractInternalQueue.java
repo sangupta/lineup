@@ -132,7 +132,7 @@ public abstract class AbstractInternalQueue implements InternalQueue {
 	 */
 	@Override
 	public QueueMessage getMessage(long longPollTime) throws InterruptedException {
-		QueueMessage qm = this.QUEUE.poll(longPollTime, TimeUnit.SECONDS);
+		QueueMessage qm = this.QUEUE.poll(longPollTime, TimeUnit.MILLISECONDS);
 		if(qm != null) {
 			removeMessage(qm);
 		}

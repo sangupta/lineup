@@ -120,6 +120,9 @@ public class LineUpServer {
 		
         
 		this.threadSelector = GrizzlyWebContainerFactory.create(serverURL, initParams);
+		this.threadSelector.setReuseAddress(false);
+		this.threadSelector.setSocketKeepAlive(false);
+		
 		this.started = true;
 	}
 	
