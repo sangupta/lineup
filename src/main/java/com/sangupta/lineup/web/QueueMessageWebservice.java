@@ -83,8 +83,6 @@ public class QueueMessageWebservice {
 	 * @return
 	 */
 	private Object getMessageFromQueue(DefaultLineUpQueue queue, int numMessages, long pollTime) {
-		pollTime = 0;
-		
 		if(numMessages == 1) {
 			if(pollTime == 0) {
 				return queue.getMessage();
