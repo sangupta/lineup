@@ -223,4 +223,11 @@ public class RemoteLineUpQueue extends AbstractLineUpBlockingQueue {
 		throw new RuntimeException("Not yet implemented");
 	}
 
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return this.remoteQueue;
+	}
 }

@@ -33,6 +33,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sangupta.jerry.http.HttpStatusCode;
 import com.sangupta.lineup.LineUp;
 import com.sangupta.lineup.domain.DefaultLineUpQueue;
@@ -45,6 +48,15 @@ import com.sangupta.lineup.exceptions.QueueNotFoundException;
  */
 @Path("/messages/")
 public class QueueMessageWebservice {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(QueueMessageWebservice.class);
+	
+	@GET
+	@Path("available")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String available() {
+		return "Yes";
+	}
 	
 	@GET
 	@Path("{secureCode}/{queue}")
@@ -67,7 +79,11 @@ public class QueueMessageWebservice {
 			throw new WebApplicationException(HttpStatusCode.BAD_REQUEST);
 		}
 		
+		long start = System.currentTimeMillis();
 		Object messages = getMessageFromQueue(queue, numMessages, pollTime);
+		long end = System.currentTimeMillis();
+		
+		LOGGER.debug("Read message in " + (end - start) + "ms.");
 		if(messages == null) {
 			throw new WebApplicationException(HttpStatusCode.NOT_FOUND);
 		}
