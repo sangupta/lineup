@@ -37,8 +37,21 @@ import com.sangupta.lineup.exceptions.QueueNotFoundException;
  *
  */
 public interface QueueService {
-	
+
+	/**
+	 * 
+	 * @param name
+	 * @return
+	 * @throws QueueAlreadyExistsException
+	 */
 	public DefaultLineUpQueue createQueue(String name) throws QueueAlreadyExistsException;
+	
+	/**
+	 * @param name
+	 * @param securityCode
+	 * @return
+	 */
+	public DefaultLineUpQueue createQueue(String name, String securityCode) throws QueueAlreadyExistsException;
 	
 	/**
 	 * Create a queue with the given name. Return the queue url that needs to be used when
@@ -83,5 +96,5 @@ public interface QueueService {
 	 * @throws QueueNotFoundException 
 	 */
 	public DefaultLineUpQueue getQueue(String name, String securityCode) throws QueueNotFoundException;
-	
+
 }

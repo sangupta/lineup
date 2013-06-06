@@ -113,6 +113,18 @@ public class LineUp {
 	public static DefaultLineUpQueue createMessageQueue(String name) throws QueueAlreadyExistsException {
 		return QUEUE_SERVICE.createQueue(name);
 	}
+
+	/**
+	 * Get a new queue with default options with the given security code.
+	 * 
+	 * @param name
+	 * @param securityCode
+	 * @return
+	 * @throws QueueAlreadyExistsException
+	 */
+	public static DefaultLineUpQueue createMessageQueue(String name, String securityCode) throws QueueAlreadyExistsException {
+		return QUEUE_SERVICE.createQueue(name, securityCode);
+	}
 	
 	/**
 	 * Get a new queue with default options but of the given type.

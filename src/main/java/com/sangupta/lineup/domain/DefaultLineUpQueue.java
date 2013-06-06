@@ -64,13 +64,17 @@ public class DefaultLineUpQueue extends AbstractLineUpBlockingQueue {
 	 * @param options
 	 * @param internalQueue
 	 */
-	public DefaultLineUpQueue(String name, QueueOptions options, InternalQueue internalQueue) {
+	public DefaultLineUpQueue(String name, String securityCode, QueueOptions options, InternalQueue internalQueue) {
 		this.name = name;
 		this.options = options;
 		this.internalQueue = internalQueue;
 		
 		// initialize other params
-		this.securityCode = UUID.randomUUID().toString();
+		if(securityCode == null) {
+			this.securityCode = UUID.randomUUID().toString();
+		} else {
+			this.securityCode = securityCode;
+		}
 	}
 	
 	/**

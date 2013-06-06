@@ -52,7 +52,15 @@ public class DefaultQueueService implements QueueService {
 	 * @see com.sangupta.lineup.service.QueueService#createQueue(java.lang.String)
 	 */
 	public DefaultLineUpQueue createQueue(String name) throws QueueAlreadyExistsException {
-		return createQueue(name, new QueueOptions());
+		return createQueue(name, null, new QueueOptions());
+	}
+	
+	/**
+	 * 
+	 * @see com.sangupta.lineup.service.QueueService#createQueue(java.lang.String, java.lang.String)
+	 */
+	public DefaultLineUpQueue createQueue(String name, String securityCode) throws QueueAlreadyExistsException {
+		return createQueue(name, securityCode, new QueueOptions());
 	}
 
 	/**
@@ -61,6 +69,18 @@ public class DefaultQueueService implements QueueService {
 	 */
 	@Override
 	public DefaultLineUpQueue createQueue(String name, QueueOptions options) throws QueueAlreadyExistsException {
+		return createQueue(name, null, options);
+	}
+	
+	/**
+	 * 
+	 * @param name
+	 * @param securityCode
+	 * @param options
+	 * @return
+	 * @throws QueueAlreadyExistsException
+	 */
+	private DefaultLineUpQueue createQueue(String name, String securityCode, QueueOptions options) throws QueueAlreadyExistsException {
 		if(AssertUtils.isEmpty(name)) {
 			throw new IllegalArgumentException("Queue name cannot be empty");
 		}
@@ -73,7 +93,7 @@ public class DefaultQueueService implements QueueService {
 			throw new QueueAlreadyExistsException();
 		}
 		
-		DefaultLineUpQueue queue = QueueGenerationFactory.getLineUpQueue(name, options);
+		DefaultLineUpQueue queue = QueueGenerationFactory.getLineUpQueue(name, securityCode, options);
 		DefaultLineUpQueue previous = myQueues.putIfAbsent(name, queue);
 		if(previous != null) {
 			throw new QueueAlreadyExistsException();

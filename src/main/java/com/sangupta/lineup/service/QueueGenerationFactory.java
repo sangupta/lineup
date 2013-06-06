@@ -35,7 +35,7 @@ import com.sangupta.lineup.queues.PriorityInternalQueue;
  */
 public class QueueGenerationFactory {
 	
-	public static DefaultLineUpQueue getLineUpQueue(String name, QueueOptions options) {
+	public static DefaultLineUpQueue getLineUpQueue(String name, String securityCode, QueueOptions options) {
 		final QueueType queueType = options.getQueueType();
 		
 		if(queueType == null) {
@@ -44,13 +44,13 @@ public class QueueGenerationFactory {
 		
 		switch (queueType) {
 			case AllowDuplicates:
-				return new DefaultLineUpQueue(name, options, new DuplicateAcceptingInternalQueue(options.getDelaySeconds()));
+				return new DefaultLineUpQueue(name, securityCode, options, new DuplicateAcceptingInternalQueue(options.getDelaySeconds()));
 				
 			case PriorityQueue:
-				return new DefaultPriorityLineUpQueue(name, options, new PriorityInternalQueue(options.getDelaySeconds()));
+				return new DefaultPriorityLineUpQueue(name, securityCode, options, new PriorityInternalQueue(options.getDelaySeconds()));
 				
 			case RejectDuplicates:
-				return new DefaultLineUpQueue(name, options, new DuplicateRejectingInternalQueue(options.getDelaySeconds()));
+				return new DefaultLineUpQueue(name, securityCode, options, new DuplicateRejectingInternalQueue(options.getDelaySeconds()));
 		}
 		
 		throw new IllegalArgumentException("Queue type is neither null/nor recognized by the system");

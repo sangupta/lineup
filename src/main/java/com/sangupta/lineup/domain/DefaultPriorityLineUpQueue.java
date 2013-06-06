@@ -37,8 +37,8 @@ public class DefaultPriorityLineUpQueue extends DefaultLineUpQueue {
 	 * @param options
 	 * @param internalQueue
 	 */
-	public DefaultPriorityLineUpQueue(String name, QueueOptions options, InternalQueue internalQueue) {
-		super(name, options, internalQueue);
+	public DefaultPriorityLineUpQueue(String name, String securityCode, QueueOptions options, InternalQueue internalQueue) {
+		super(name, securityCode, options, internalQueue);
 	}
 
 	public QueueMessage addPriorityMessage(String message, int priority) {
