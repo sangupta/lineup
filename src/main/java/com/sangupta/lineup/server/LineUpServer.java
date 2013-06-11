@@ -153,5 +153,26 @@ public class LineUpServer {
 	public boolean isRunning() {
 		return this.started;
 	}
+	
+	/**
+	 * Method that will register a shutdown hook so that the server
+	 * can be closed, when the application exits.
+	 * 
+	 */
+	public void registerShutdownHook() {
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			
+			/**
+			 * @see java.lang.Thread#run()
+			 */
+			@Override
+			public void run() {
+				super.run();
+				
+				stopServer();
+			}
+			
+		});
+	}
 
 }
