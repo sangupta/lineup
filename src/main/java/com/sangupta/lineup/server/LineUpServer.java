@@ -169,7 +169,9 @@ public class LineUpServer {
 			public void run() {
 				super.run();
 				
-				stopServer();
+				if(started) {
+					stopServer();
+				}
 			}
 			
 		});
