@@ -25,6 +25,9 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sangupta.jerry.http.WebInvoker;
 import com.sangupta.jerry.http.WebRequestMethod;
 import com.sangupta.jerry.http.WebResponse;
@@ -38,6 +41,8 @@ import com.sangupta.jerry.util.XStreamUtils;
  *
  */
 public class RemoteLineUpQueue extends AbstractLineUpBlockingQueue {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(RemoteLineUpQueue.class);
 	
 	/**
 	 * The URL of the remote queue.
@@ -121,6 +126,11 @@ public class RemoteLineUpQueue extends AbstractLineUpBlockingQueue {
 	public QueueMessage addMessage(String message) {
 		WebResponse response = WebInvoker.postXML(this.remoteQueue, new QueueMessage(message, 0, 1));
 		if(response == null) {
+			return null;
+		}
+		
+		if(!response.isSuccess()) {
+			LOGGER.error("Error posting message to remote queue for reason: ", response);
 			return null;
 		}
 		
