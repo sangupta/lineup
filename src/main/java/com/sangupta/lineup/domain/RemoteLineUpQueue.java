@@ -168,7 +168,7 @@ public class RemoteLineUpQueue extends AbstractLineUpBlockingQueue {
 	 */
 	@Override
 	public QueueMessage getMessage() {
-		return getMessage(DateUtils.FIVE_MINUTES);
+		return getMessage(DateUtils.ONE_SECOND * 5);
 	}
 
 	/**

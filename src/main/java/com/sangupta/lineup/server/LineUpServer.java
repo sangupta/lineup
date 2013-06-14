@@ -22,12 +22,9 @@
 package com.sangupta.lineup.server;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
+import com.sangupta.jerry.jersey.JerseyGrizzlyServer;
 import com.sangupta.jerry.util.AssertUtils;
-import com.sun.grizzly.http.SelectorThread;
-import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 
 /**
  * A Grizzly based webserver that can accept REST based incoming
@@ -41,28 +38,12 @@ public class LineUpServer {
 	/**
 	 * Default webservices packages to load  
 	 */
-	private static final String DEFAULT_WEBSERVICES_PACKAGES = "com.sangupta.lineup com.sangupta.jerry.jersey";
+	private static final String[] DEFAULT_WEBSERVICES_PACKAGES = { "com.sangupta.lineup", "com.sangupta.jerry.jersey" };
 
-	/**
-	 * The server URL where we will hook up.
-	 */
-	private final String serverURL;
-	
-	/**
-	 * Initialization parameters for grizzly container
-	 */
-	private final Map<String, String> initParams;
-	
-	/**
-	 * Keeps track of whether the server is running or not.
-	 * 
-	 */
-	private volatile boolean started = false;
-	
 	/**
 	 * The thread selector obtained from Grizzly container
 	 */
-    private SelectorThread threadSelector = null;
+    private final JerseyGrizzlyServer server;
     
     /**
      * Create a new {@link LineUpServer} instance with default
@@ -83,98 +64,32 @@ public class LineUpServer {
 	 * @param customJerseyWebservices
 	 */
 	public LineUpServer(final String serverURL, final String[] customJerseyWebservices) {
-		if(AssertUtils.isEmpty(serverURL)) {
-			throw new IllegalArgumentException("Server URL must be provided, cannot be null/empty");
-		}
-		
-		this.serverURL = serverURL;
-		initParams = new HashMap<String, String>();
-		
 		if(AssertUtils.isEmpty(customJerseyWebservices)) {
-			initParams.put("com.sun.jersey.config.property.packages", DEFAULT_WEBSERVICES_PACKAGES);
-		} else {
-			final StringBuilder packages = new StringBuilder(DEFAULT_WEBSERVICES_PACKAGES);
-			for(String customPackage : customJerseyWebservices) {
-				packages.append(' ');
-				packages.append(customPackage);
-			}
-			
-			initParams.put("com.sun.jersey.config.property.packages", packages.toString());
-		}
-	}
-	
-	/**
-	 * Start the server.
-	 *  
-	 * @throws IOException
-	 *  
-	 * @throws IllegalArgumentException 
-	 * 
-	 * @throws IllegalStateException if the server is already running.
-	 * 
-	 */
-	public void startServer() throws IllegalArgumentException, IOException {
-		if(this.started) {
-			throw new IllegalStateException("Server is already running.");
+			this.server = new JerseyGrizzlyServer(serverURL, DEFAULT_WEBSERVICES_PACKAGES);
+			return;
 		}
 		
-        
-		this.threadSelector = GrizzlyWebContainerFactory.create(serverURL, initParams);
-		this.threadSelector.setReuseAddress(false);
-		this.threadSelector.setSocketKeepAlive(false);
+		int total = DEFAULT_WEBSERVICES_PACKAGES.length + customJerseyWebservices.length;
+		String[] array = new String[total];
+		for(int index = 0; index < DEFAULT_WEBSERVICES_PACKAGES.length; index++) {
+			array[index] = DEFAULT_WEBSERVICES_PACKAGES[index];
+		}
+		for(int index = DEFAULT_WEBSERVICES_PACKAGES.length; index < total; index++) {
+			array[index] = customJerseyWebservices[index - DEFAULT_WEBSERVICES_PACKAGES.length];
+		}
 		
-		this.started = true;
+		this.server = new JerseyGrizzlyServer(serverURL, array);
 	}
 	
-	/**
-	 * Stop the currently running server.
-	 * 
-	 * @throws IllegalStateException if the server is already stopped.
-	 * 
-	 */
+	public void startServer() throws IOException {
+		this.server.startServer();
+	}
+	
 	public void stopServer() {
-		if(!this.started) {
-			throw new IllegalStateException("Server has not yet started.");
-		}
-		
-		if(this.threadSelector != null) {
-			this.threadSelector.stopEndpoint();
-		}
-		
-		this.started = false;
-		this.threadSelector = null;
+		this.server.stopServer();
 	}
 	
-	/**
-	 * Returns whether the server is running or not.
-	 * 
-	 * @return
-	 */
 	public boolean isRunning() {
-		return this.started;
+		return this.server.isRunning();
 	}
-	
-	/**
-	 * Method that will register a shutdown hook so that the server
-	 * can be closed, when the application exits.
-	 * 
-	 */
-	public void registerShutdownHook() {
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			
-			/**
-			 * @see java.lang.Thread#run()
-			 */
-			@Override
-			public void run() {
-				super.run();
-				
-				if(started) {
-					stopServer();
-				}
-			}
-			
-		});
-	}
-
 }

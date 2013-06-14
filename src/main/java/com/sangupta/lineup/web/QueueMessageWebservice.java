@@ -83,11 +83,11 @@ public class QueueMessageWebservice {
 		Object messages = getMessageFromQueue(queue, numMessages, pollTime);
 		long end = System.currentTimeMillis();
 		
-		LOGGER.debug("Read message in " + (end - start) + "ms.");
 		if(messages == null) {
 			throw new WebApplicationException(HttpStatusCode.NOT_FOUND);
 		}
 		
+		LOGGER.debug("Read message in " + (end - start) + "ms.");
 		return messages;
 	}
 	
