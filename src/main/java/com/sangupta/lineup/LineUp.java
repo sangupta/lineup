@@ -207,4 +207,18 @@ public class LineUp {
 		return new RemoteLineUpQueue(lineUpServer, queueName, securityCode);
 	}
 	
+	/**
+	 * Connect to an existing code at the given server address, and queue name with
+	 * the given security code. The given default poll time will be used when polling
+	 * the queue for messages.
+	 * 
+	 * @param lineUpServer
+	 * @param queueName
+	 * @param securityCode
+	 * @param pollTime
+	 * @return
+	 */
+	public static LineUpQueue connectRemote(final String lineUpServer, final String queueName, final String securityCode, long defaultPollTime) {
+		return new RemoteLineUpQueue(lineUpServer, queueName, securityCode, defaultPollTime);
+	}
 }

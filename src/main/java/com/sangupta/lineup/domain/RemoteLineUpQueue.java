@@ -44,11 +44,18 @@ public class RemoteLineUpQueue extends AbstractLineUpBlockingQueue {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(RemoteLineUpQueue.class);
 	
+	private static final long DEFAULT_POLL_TIME = DateUtils.ONE_SECOND;
+	
 	/**
 	 * The URL of the remote queue.
 	 * 
 	 */
 	private final String remoteQueue;
+	
+	/**
+	 * The default poll time to use for this queue
+	 */
+	private final long messagePollTime;
 	
 	/**
 	 * Create a {@link LineUpQueue} that connects to the given remote queue.
@@ -61,6 +68,7 @@ public class RemoteLineUpQueue extends AbstractLineUpBlockingQueue {
 		}
 		
 		this.remoteQueue = queueURL;
+		this.messagePollTime = DEFAULT_POLL_TIME;
 	}
 	
 	/**
@@ -105,6 +113,7 @@ public class RemoteLineUpQueue extends AbstractLineUpBlockingQueue {
 		}
 		
 		this.remoteQueue = UriUtils.addWebPaths(lineUpServer, "messages/" + queue.getSecurityCode() + "/" + queueName);
+		this.messagePollTime = DEFAULT_POLL_TIME;
 	}
 	
 	/**
@@ -116,7 +125,12 @@ public class RemoteLineUpQueue extends AbstractLineUpBlockingQueue {
 	 * @param securityCode
 	 */
 	public RemoteLineUpQueue(String lineUpServer, String queueName, String securityCode) {
+		this(lineUpServer, queueName, securityCode, DEFAULT_POLL_TIME);
+	}
+	
+	public RemoteLineUpQueue(String lineUpServer, String queueName, String securityCode, long defaultPollTime) {
 		this.remoteQueue = UriUtils.addWebPaths(lineUpServer, "messages/" + securityCode + "/" + queueName);
+		this.messagePollTime = defaultPollTime;
 	}
 	
 	/**
@@ -168,7 +182,7 @@ public class RemoteLineUpQueue extends AbstractLineUpBlockingQueue {
 	 */
 	@Override
 	public QueueMessage getMessage() {
-		return getMessage(DateUtils.ONE_SECOND * 5);
+		return getMessage(this.messagePollTime);
 	}
 
 	/**
