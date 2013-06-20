@@ -39,27 +39,50 @@ import com.sangupta.lineup.exceptions.QueueNotFoundException;
 public interface QueueService {
 
 	/**
+	 * Create a queue with the given name
 	 * 
 	 * @param name
-	 * @return
+	 *            the name to use for the queue
+	 * 
+	 * @return the newly created queue
+	 * 
 	 * @throws QueueAlreadyExistsException
+	 *             if a queue already exists with that name
 	 */
 	public DefaultLineUpQueue createQueue(String name) throws QueueAlreadyExistsException;
 	
 	/**
+	 * Create a queue with the given name and given security code.
+	 * 
 	 * @param name
+	 *            the name to use for the queue
+	 * 
 	 * @param securityCode
-	 * @return
+	 *            the security code to use for the queue
+	 * 
+	 * @return the newly created queue
+	 * 
+	 * @throws QueueAlreadyExistsException
+	 *             if a queue already exists with that name
+	 * 
 	 */
 	public DefaultLineUpQueue createQueue(String name, String securityCode) throws QueueAlreadyExistsException;
 	
 	/**
-	 * Create a queue with the given name. Return the queue url that needs to be used when
-	 * accessing it.
+	 * Create a queue with the given name. Return the queue url that needs to be
+	 * used when accessing it.
 	 * 
 	 * @param name
+	 *            the name to use for the queue
+	 * 
 	 * @param options
-	 * @return
+	 *            the options to use when creating the queue
+	 * 
+	 * @return the newly created queue
+	 * 
+	 * @throws QueueAlreadyExistsException
+	 *             if a queue already exists with that name
+	 * 
 	 */
 	public DefaultLineUpQueue createQueue(String name, QueueOptions options) throws QueueAlreadyExistsException;
 
@@ -67,7 +90,14 @@ public interface QueueService {
 	 * Delete a queue from the memory.
 	 * 
 	 * @param name
-	 * @return
+	 *            the name of the queue to be deleted
+	 * 
+	 * @return <code>true</code> if we could successfully delete the queue,
+	 *         <code>false</code> otherwise
+	 * 
+	 * @throws QueueAlreadyDeletedException
+	 *             if the queue was very recently deleted
+	 * 
 	 */
 	public boolean deleteQueue(String name) throws QueueAlreadyDeletedException;
 
@@ -75,25 +105,40 @@ public interface QueueService {
 	 * Get the queue URL for the given name.
 	 * 
 	 * @param name
-	 * @return
+	 *            the name of the queue
+	 * 
+	 * @return the URL to use when connecting to this queue remotely
+	 * 
+	 * @throws QueueNotFoundException
+	 *             if no queue was found with the given name
 	 */
 	public String getQueueUrl(String name) throws QueueNotFoundException;
 	
 	/**
-	 * Return a list of all queue's that match the specified prefix. If not prefix is given
-	 * then return a list of all queues.
+	 * Return a list of all queue's that match the specified prefix. If not
+	 * prefix is given then return a list of all queues.
 	 * 
 	 * @param prefix
-	 * @return
+	 *            the prefix to test startWith with
+	 * 
+	 * @return a list of all queue names as found.
+	 * 
 	 */
 	public List<String> getAllQueues(String prefix);
 
 	/**
+	 * Get a previously created queue with the given name and security code
 	 * 
 	 * @param name
+	 *            the name of the queue we are looking for
+	 * 
 	 * @param securityCode
-	 * @return
-	 * @throws QueueNotFoundException 
+	 *            the security code associated with the queue
+	 * 
+	 * @return the queue instance if found
+	 * 
+	 * @throws QueueNotFoundException
+	 *             if no such queue was found
 	 */
 	public DefaultLineUpQueue getQueue(String name, String securityCode) throws QueueNotFoundException;
 
