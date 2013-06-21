@@ -3,18 +3,19 @@ LineUp
 
 LineUp is a simple in-memory high-throughput message queue service for Java. It can be used as:
 
-# As a standalone service accessible via REST services
-# Embedded inside an application
+* As a standalone service accessible via REST services
+* Embedded inside an application
 
 Features
 --------
-# In-memory and high-throughput
-# Three different queue types
-## Default: all messages are allowed, including duplicates
-## Reject Duplicates: reject all duplicate messages
-## Priority: accept all duplicates and merge them to increase their priority
-# Accesible via REST API
-# Amazon SQS API compliant
+
+* In-memory and high-throughput
+* Three different queue types
+** Default: all messages are allowed, including duplicates
+** Reject Duplicates: reject all duplicate messages
+** Priority: accept all duplicates and merge them to increase their priority
+* Accesible via REST API
+* Amazon SQS API compliant
 
 **NOTE:** The library is currently under development and may not be stable or may not support all features.
 
