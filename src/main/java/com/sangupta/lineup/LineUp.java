@@ -46,7 +46,7 @@ import com.sangupta.lineup.service.impl.DefaultQueueService;
 public class LineUp {
 	
 	/**
-	 * Our own single-ton instance
+	 * Our own singleton instance
 	 */
 	private static final QueueService QUEUE_SERVICE = new DefaultQueueService();
 
@@ -63,8 +63,10 @@ public class LineUp {
     /**
      * Main function that starts the {@link LineUpServer}.
      * 
-     * @param args
-     * @throws IOException 
+     * @param args the arguments from the command line.
+     * 
+     * @throws IOException
+     *  
      * @throws IllegalArgumentException 
      */
     public static void main(String[] args) throws IllegalArgumentException, IOException {

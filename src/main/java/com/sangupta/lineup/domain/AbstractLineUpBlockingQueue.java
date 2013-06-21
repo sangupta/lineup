@@ -40,6 +40,11 @@ import com.sangupta.jerry.util.AssertUtils;
 public abstract class AbstractLineUpBlockingQueue implements LineUpQueue {
 
 	/**
+	 * Remove a message from the queue
+	 * 
+	 * @return the message that was removed from the queue, <code>null</code> if
+	 *         nothing was removed
+	 * 
 	 * @see java.util.Queue#remove()
 	 */
 	@Override
@@ -53,6 +58,10 @@ public abstract class AbstractLineUpBlockingQueue implements LineUpQueue {
 	}
 
 	/**
+	 * Return a message if available in the queue.
+	 * 
+	 * @return the message if available in the queue.
+	 *  
 	 * @see java.util.Queue#poll()
 	 */
 	@Override

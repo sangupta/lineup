@@ -24,10 +24,14 @@ package com.sangupta.lineup.domain;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
+import com.sangupta.lineup.LineUp;
+
 /**
+ * Contract for any queue implementation that needs to serve in the
+ * {@link LineUp} infrastructure.
  * 
  * @author sangupta
- *
+ * 
  */
 public interface LineUpQueue extends BlockingQueue<QueueMessage> {
 	
@@ -35,32 +39,49 @@ public interface LineUpQueue extends BlockingQueue<QueueMessage> {
 	 * Add a message to the internal queue.
 	 * 
 	 * @param message
-	 * @return
+	 *            the {@link String} message that needs to be added to the queue
+	 * 
+	 * @return the {@link QueueMessage} instance that was added,
+	 *         <code>null</code> if nothing was added.
+	 * 
 	 */
 	public QueueMessage addMessage(String message);
 	
 	/**
-	 * Add a message to the internal queue.
+	 * Add a message to the internal queue with the given delay.
 	 * 
 	 * @param message
+	 *            the {@link String} message that needs to be added to the queue
+	 * 
 	 * @param delaySeconds
-	 * @return
+	 *            the time after which the message is made available in the
+	 *            queue
+	 * 
+	 * @return the {@link QueueMessage} instance that was added,
+	 *         <code>null</code> if nothing was added.
 	 */
 	public QueueMessage addMessage(String message, int delaySeconds);
 	
 	/**
-	 * Add a message to the internal queue.
+	 * Add a message to the internal queue provided as a {@link QueueMessage}
+	 * instance
 	 * 
 	 * @param queueMessage
-	 * @return
+	 *            the message to be added
+	 * 
+	 * @return the instance itself it was added, <code>null</code> if nothing
+	 *         was added.
+	 * 
 	 */
 	public QueueMessage addMessage(QueueMessage queueMessage);
 	
 	/**
-	 * Return a message from the queue, without waiting. Returns <code>null</code>
-	 * if the queue is currently empty.
+	 * Return a message from the queue, without waiting. Returns
+	 * <code>null</code> if the queue is currently empty.
 	 * 
-	 * @return
+	 * @return the {@link QueueMessage} instance which is wrapping up the actual
+	 *         message
+	 * 
 	 */
 	public QueueMessage getMessage();
 	
@@ -69,8 +90,15 @@ public interface LineUpQueue extends BlockingQueue<QueueMessage> {
 	 * before returning <code>null</code>.
 	 * 
 	 * @param longPollTime
-	 * @return
+	 *            the time to wait before which the call would return
+	 *            <code>null</code> if no message is available
+	 * 
+	 * @return the {@link QueueMessage} if one was available, <code>null</code>
+	 *         otherwise
+	 * 
 	 * @throws InterruptedException
+	 *             if the method was interrupted as part of shutdown or thread
+	 *             closure or otherwise
 	 */
 	public QueueMessage getMessage(long longPollTime) throws InterruptedException;
 	
@@ -78,7 +106,10 @@ public interface LineUpQueue extends BlockingQueue<QueueMessage> {
 	 * Return given number of messages from the queue.
 	 * 
 	 * @param numMessages
-	 * @return
+	 *            the number of message to read from the queue
+	 * 
+	 * @return a {@link List} object containing either the equal number of
+	 *         object, or less if there is a scarcity
 	 */
 	public List<QueueMessage> getMessages(int numMessages);
 	
@@ -86,14 +117,18 @@ public interface LineUpQueue extends BlockingQueue<QueueMessage> {
 	 * Delete the message with the given identifier from the queue.
 	 * 
 	 * @param messageID
-	 * @return
+	 *            the message identifier uniquely identifying the message
+	 * @return <code>true</code> if the message was deleted successfully,
+	 *         <code>false</code> otherwise.
+	 * 
 	 */
 	public boolean deleteMessage(String messageID);
 	
 	/**
-	 * Returns the number of messages in the queue.
+	 * Returns the total number of messages in the queue.
 	 * 
-	 * @return
+	 * @return the number of messages in the queue
+	 * 
 	 */
 	public int numMessages();
 

@@ -23,65 +23,100 @@ package com.sangupta.lineup.queues;
 
 import java.util.List;
 
+import com.sangupta.lineup.domain.LineUpQueue;
 import com.sangupta.lineup.domain.QueueMessage;
 
 /**
+ * Contract for all implementations that will provide the functionality
+ * of an {@link InternalQueue} which can be embedded inside an actual
+ * {@link LineUpQueue} instance.
+ * 
  * @author sangupta
  *
  */
 public interface InternalQueue {
 	
 	/**
-	 * Create a new message in the queue
+	 * Add a message to the internal queue.
 	 * 
 	 * @param message
-	 * @return
+	 *            the {@link String} message that needs to be added to the queue
+	 * 
+	 * @return the {@link QueueMessage} instance that was added,
+	 *         <code>null</code> if nothing was added.
+	 * 
 	 */
 	public QueueMessage addMessage(String message);
 
 	/**
+	 * Add a message to the internal queue with the given delay.
 	 * 
 	 * @param message
+	 *            the {@link String} message that needs to be added to the queue
+	 * 
 	 * @param delaySeconds
-	 * @return
+	 *            the time after which the message is made available in the
+	 *            queue
+	 * 
+	 * @return the {@link QueueMessage} instance that was added,
+	 *         <code>null</code> if nothing was added.
 	 */
 	public QueueMessage addMessage(String message, int delaySeconds);
 	
 	/**
-	 * Return back a message without waiting.
+	 * Return a message from the queue, without waiting. Returns
+	 * <code>null</code> if the queue is currently empty.
 	 * 
-	 * @return
+	 * @return the {@link QueueMessage} instance which is wrapping up the actual
+	 *         message
+	 * 
 	 */
 	public QueueMessage getMessage();
 	
 	/**
+	 * Return a message from the queue, waiting for the specified poll time
+	 * before returning <code>null</code>.
 	 * 
 	 * @param longPollTime
-	 * @return
+	 *            the time to wait before which the call would return
+	 *            <code>null</code> if no message is available
+	 * 
+	 * @return the {@link QueueMessage} if one was available, <code>null</code>
+	 *         otherwise
+	 * 
 	 * @throws InterruptedException
+	 *             if the method was interrupted as part of shutdown or thread
+	 *             closure or otherwise
 	 */
 	public QueueMessage getMessage(long longPollTime) throws InterruptedException;
 	
 	/**
-	 * Return N number of messages from this queue.
+	 * Return given number of messages from the queue.
 	 * 
 	 * @param numMessages
-	 * @return
+	 *            the number of message to read from the queue
+	 * 
+	 * @return a {@link List} object containing either the equal number of
+	 *         object, or less if there is a scarcity
 	 */
 	public List<QueueMessage> getMessages(int numMessages);
 	
 	/**
-	 * Delete the message as specified by the provided message identifier.
+	 * Delete the message with the given identifier from the queue.
 	 * 
 	 * @param messageID
-	 * @return
+	 *            the message identifier uniquely identifying the message
+	 * @return <code>true</code> if the message was deleted successfully,
+	 *         <code>false</code> otherwise.
+	 * 
 	 */
 	public boolean deleteMessage(String messageID);
 	
 	/**
-	 * Return the current size of the queue.
+	 * Returns the total number of messages in the queue.
 	 * 
-	 * @return
+	 * @return the number of messages in the queue
+	 * 
 	 */
 	public int size();
 	
