@@ -11,9 +11,9 @@ Features
 
 * In-memory and high-throughput
 * Three different queue types
-** Default: all messages are allowed, including duplicates
-** Reject Duplicates: reject all duplicate messages
-** Priority: accept all duplicates and merge them to increase their priority
+ * Default: all messages are allowed, including duplicates
+ * Reject Duplicates: reject all duplicate messages
+ * Priority: accept all duplicates and merge them to increase their priority
 * Accesible via REST API
 * Amazon SQS API compliant
 
