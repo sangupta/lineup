@@ -85,6 +85,27 @@ public interface QueueService {
 	 * 
 	 */
 	public DefaultLineUpQueue createQueue(String name, QueueOptions options) throws QueueAlreadyExistsException;
+	
+	/**
+	 * Create a queue with the given name. Return the queue url that needs to be
+	 * used when accessing it.
+	 * 
+	 * @param name
+	 *            the name to use for the queue
+	 * 
+	 * @param securityCode
+	 *            the security code to use for the queue
+	 * 
+	 * @param options
+	 *            the options to use when creating the queue
+	 * 
+	 * @return the newly created queue
+	 * 
+	 * @throws QueueAlreadyExistsException
+	 *             if a queue already exists with that name
+	 * 
+	 */
+	public DefaultLineUpQueue createQueue(String name, String securityCode, QueueOptions options) throws QueueAlreadyExistsException;
 
 	/**
 	 * Delete a queue from the memory.

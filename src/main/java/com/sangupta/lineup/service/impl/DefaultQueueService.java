@@ -80,7 +80,7 @@ public class DefaultQueueService implements QueueService {
 	 * @return
 	 * @throws QueueAlreadyExistsException
 	 */
-	private DefaultLineUpQueue createQueue(String name, String securityCode, QueueOptions options) throws QueueAlreadyExistsException {
+	public DefaultLineUpQueue createQueue(String name, String securityCode, QueueOptions options) throws QueueAlreadyExistsException {
 		if(AssertUtils.isEmpty(name)) {
 			throw new IllegalArgumentException("Queue name cannot be empty");
 		}
