@@ -150,13 +150,21 @@ public class RemoteLineUpQueue extends AbstractLineUpBlockingQueue {
 		
 		return (QueueMessage) XStreamUtils.getXStream(QueueMessage.class).fromXML(response.asStream());
 	}
-
+	
 	/**
 	 * @see com.sangupta.lineup.domain.LineUpQueue#addMessage(java.lang.String, int)
 	 */
 	@Override
 	public QueueMessage addMessage(String message, int delaySeconds) {
-		WebResponse response = WebInvoker.postXML(this.remoteQueue, new QueueMessage(message, delaySeconds, 1));
+		return addMessage(message, delaySeconds, 1);
+	}
+
+	/**
+	 * @see com.sangupta.lineup.domain.LineUpQueue#addMessage(java.lang.String, int, int)
+	 */
+	@Override
+	public QueueMessage addMessage(String message, int delaySeconds, int priority) {
+		WebResponse response = WebInvoker.postXML(this.remoteQueue, new QueueMessage(message, delaySeconds, priority));
 		if(response == null) {
 			return null;
 		}
