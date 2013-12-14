@@ -62,6 +62,8 @@ public interface LineUpQueue extends BlockingQueue<QueueMessage> {
 	 */
 	public QueueMessage addMessage(String message, int delaySeconds);
 	
+	public QueueMessage addMessage(String message, int delaySeconds, int priority);
+	
 	/**
 	 * Add a message to the internal queue provided as a {@link QueueMessage}
 	 * instance

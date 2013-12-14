@@ -46,6 +46,6 @@ public class DefaultPriorityLineUpQueue extends DefaultLineUpQueue {
 	}
 	
 	public QueueMessage addPriorityMessage(String message, int delaySeconds, int priority) {
-		return addMessage(new QueueMessage(message, delaySeconds, priority));
+		return addMessage(message, delaySeconds, priority);
 	}
 }

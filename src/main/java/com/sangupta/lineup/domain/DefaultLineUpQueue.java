@@ -140,6 +140,26 @@ public class DefaultLineUpQueue extends AbstractLineUpBlockingQueue {
 	}
 	
 	/**
+	 * Add a message to the internal queue with the given delay.
+	 * 
+	 * @param message
+	 *            the {@link String} message that needs to be added to the queue
+	 * 
+	 * @param delaySeconds
+	 *            the time after which the message is made available in the
+	 *            queue
+	 * 
+	 * @return the {@link QueueMessage} instance that was added,
+	 *         <code>null</code> if nothing was added.
+	 *         
+	 * @see LineUpQueue#addMessage(String, int)
+	 */
+	@Override
+	public QueueMessage addMessage(String message, int delaySeconds, int priority) {
+		return this.internalQueue.addMessage(message, delaySeconds, priority);
+	}
+	
+	/**
 	 * Add a message to the internal queue.
 	 * 
 	 * @param message
