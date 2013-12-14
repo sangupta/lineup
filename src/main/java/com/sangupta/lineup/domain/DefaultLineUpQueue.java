@@ -136,7 +136,7 @@ public class DefaultLineUpQueue extends AbstractLineUpBlockingQueue {
 	 */
 	@Override
 	public QueueMessage addMessage(String message, int delaySeconds) {
-		return this.internalQueue.addMessage(message, delaySeconds);
+		return this.internalQueue.addMessage(message, delaySeconds, 1);
 	}
 	
 	/**
@@ -152,11 +152,7 @@ public class DefaultLineUpQueue extends AbstractLineUpBlockingQueue {
 	 */
 	@Override
 	public QueueMessage addMessage(QueueMessage qm) {
-		if(qm.getDelaySeconds() >= 0) {
-			return addMessage(qm.getBody(), qm.getDelaySeconds());
-		}
-		
-		return addMessage(qm.getBody());
+		return this.internalQueue.addMessage(qm.getBody(), qm.getDelaySeconds(), qm.getPriority());
 	}
 
 	/**

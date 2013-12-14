@@ -47,13 +47,13 @@ public class DuplicateRejectingInternalQueue extends AbstractInternalQueue {
 	 * @see com.sangupta.lineup.queues.AbstractInternalQueue#addMessage(java.lang.String, int)
 	 */
 	@Override
-	public QueueMessage addMessage(String message, int delaySeconds) {
+	public QueueMessage addMessage(String message, int delaySeconds, int priority) {
 		QueueMessage qm = QueueMessage.createMessage(message);
 		if(this.QUEUE.contains(qm)) {
 			return this.myMessages.get(message);
 		}
 		
-		return super.addMessage(message, delaySeconds);
+		return super.addMessage(message, delaySeconds, priority);
 	}
 
 	/**

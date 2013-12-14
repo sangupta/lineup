@@ -93,6 +93,16 @@ public class QueueMessage implements Comparable<QueueMessage> {
 	}
 	
 	/**
+	 * Increment the priority of this message by given amount.
+	 * 
+	 * @param additive
+	 * @return
+	 */
+	public int incrementPriority(int additive) {
+		return this.priority.addAndGet(additive);
+	}
+	
+	/**
 	 * Create a dummy queue message.
 	 * 
 	 * @param messageID

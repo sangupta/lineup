@@ -98,7 +98,7 @@ public abstract class AbstractInternalQueue implements InternalQueue {
 	 */
 	@Override
 	public QueueMessage addMessage(String message) {
-		return addMessage(message, this.delaySeconds);
+		return addMessage(message, this.delaySeconds, 1);
 	}
 	
 	/**
@@ -107,10 +107,14 @@ public abstract class AbstractInternalQueue implements InternalQueue {
 	 * @param delaySeconds
 	 * @return
 	 */
-	public QueueMessage addMessage(String message, int delaySeconds) {
-		QueueMessage queueMessage = createMessage(message, delaySeconds);
-		this.QUEUE.offer(queueMessage);
-		return queueMessage;
+	public QueueMessage addMessage(String message, int delaySeconds, int priority) {
+		QueueMessage queueMessage = createMessage(message, delaySeconds, priority);
+		boolean success = this.QUEUE.offer(queueMessage);
+		if(success) {
+			return queueMessage;
+		}
+		
+		return null;
 	}
 	
 	/**
@@ -182,7 +186,7 @@ public abstract class AbstractInternalQueue implements InternalQueue {
 	 * @return
 	 */
 	protected final QueueMessage createMessage(String message) {
-		return createMessage(message, this.delaySeconds);
+		return createMessage(message, this.delaySeconds, 1);
 	}
 
 	/**
@@ -191,8 +195,8 @@ public abstract class AbstractInternalQueue implements InternalQueue {
 	 * @param delaySeconds
 	 * @return
 	 */
-	protected final QueueMessage createMessage(String message, int delaySeconds) {
-		return new QueueMessage(AUTO_INCREMENTOR.getAndIncrement(), message, delaySeconds, 1);
+	protected final QueueMessage createMessage(String message, int delaySeconds, int priority) {
+		return new QueueMessage(AUTO_INCREMENTOR.getAndIncrement(), message, delaySeconds, priority);
 	}
 	
 	// Usual accessors follow

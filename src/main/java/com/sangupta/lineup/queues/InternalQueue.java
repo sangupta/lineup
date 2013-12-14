@@ -57,11 +57,13 @@ public interface InternalQueue {
 	 * @param delaySeconds
 	 *            the time after which the message is made available in the
 	 *            queue
+	 *            
+	 * @param priority the priority of this messages
 	 * 
 	 * @return the {@link QueueMessage} instance that was added,
 	 *         <code>null</code> if nothing was added.
 	 */
-	public QueueMessage addMessage(String message, int delaySeconds);
+	public QueueMessage addMessage(String message, int delaySeconds, int priority);
 	
 	/**
 	 * Return a message from the queue, without waiting. Returns

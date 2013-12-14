@@ -57,22 +57,22 @@ public class PriorityInternalQueue extends AbstractInternalQueue {
 	 * @see com.sangupta.lineup.queues.AbstractInternalQueue#addMessage(java.lang.String, int)
 	 */
 	@Override
-	public QueueMessage addMessage(String message, int delaySeconds) {
+	public QueueMessage addMessage(String message, int delaySeconds, int priority) {
 		if(this.myMessages.containsKey(message)) {
 			// increase its priority
 			QueueMessage qm = this.myMessages.get(message);
 			if(qm != null) {
-				qm.incrementPriority();
+				qm.incrementPriority(priority);
 			}
 			
 			return qm;
 		}
 		
-		QueueMessage qm = super.addMessage(message, delaySeconds);
+		QueueMessage qm = super.addMessage(message, delaySeconds, priority);
 		if(qm != null) {
 			QueueMessage older = this.myMessages.putIfAbsent(message, qm);
 			if(older != null) {
-				older.incrementPriority();
+				older.incrementPriority(priority);
 			}
 		}
 		
