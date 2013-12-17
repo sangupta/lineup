@@ -87,7 +87,9 @@ public class QueueMessageWebservice {
 			throw new WebApplicationException(HttpStatusCode.NOT_FOUND);
 		}
 		
-		LOGGER.debug("Read message {} in {} ms.", messages, end - start);
+		if(messages instanceof QueueMessage) {
+			LOGGER.debug("Read message {} in {} ms.", ((QueueMessage) messages).getBody(), end - start);
+		}
 		return messages;
 	}
 	
