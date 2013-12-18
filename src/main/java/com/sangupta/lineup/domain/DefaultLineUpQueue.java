@@ -224,6 +224,14 @@ public class DefaultLineUpQueue extends AbstractLineUpBlockingQueue {
 	}
 	
 	/**
+	 * @see com.sangupta.lineup.domain.AbstractLineUpBlockingQueue#clear()
+	 */
+	@Override
+	public void clear() {
+		this.internalQueue.clear();
+	}
+	
+	/**
 	 * @see com.sangupta.lineup.domain.LineUpQueue#numMessages()
 	 */
 	@Override

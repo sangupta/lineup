@@ -122,4 +122,10 @@ public interface InternalQueue {
 	 */
 	public int size();
 	
+	/**
+	 * Clear all elements of this queue.
+	 * 
+	 */
+	public void clear();
+	
 }

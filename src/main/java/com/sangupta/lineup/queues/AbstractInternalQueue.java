@@ -181,6 +181,14 @@ public abstract class AbstractInternalQueue implements InternalQueue {
 	}
 	
 	/**
+	 * @see com.sangupta.lineup.queues.InternalQueue#clear()
+	 */
+	@Override
+	public void clear() {
+		this.QUEUE.clear();
+	}
+	
+	/**
 	 * 
 	 * @param message
 	 * @return
