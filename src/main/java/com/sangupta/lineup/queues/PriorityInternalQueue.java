@@ -21,9 +21,13 @@
 
 package com.sangupta.lineup.queues;
 
+import java.util.Enumeration;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sangupta.lineup.domain.QueueMessage;
 
@@ -33,6 +37,8 @@ import com.sangupta.lineup.domain.QueueMessage;
  *
  */
 public class PriorityInternalQueue extends AbstractInternalQueue {
+	
+	private final static Logger LOGGER = LoggerFactory.getLogger(PriorityInternalQueue.class);
 	
 	private final ConcurrentHashMap<String, QueueMessage> myMessages = new ConcurrentHashMap<String, QueueMessage>();
 	
@@ -57,26 +63,45 @@ public class PriorityInternalQueue extends AbstractInternalQueue {
 	 * @see com.sangupta.lineup.queues.AbstractInternalQueue#addMessage(java.lang.String, int)
 	 */
 	@Override
-	public QueueMessage addMessage(String message, int delaySeconds, int priority) {
+	public QueueMessage addMessage(final String message, int delaySeconds, int priority) {
 		if(this.myMessages.containsKey(message)) {
 			// increase its priority
 			QueueMessage qm = this.myMessages.get(message);
 			if(qm != null) {
+				LOGGER.debug("Message already exists, incrementing priority: {}", message);
 				qm.incrementPriority(priority);
+				
+				// check if this is not in internal queue
+				return qm;
 			}
-			
-			return qm;
 		}
 		
+		// message not already present
 		QueueMessage qm = super.addMessage(message, delaySeconds, priority);
-		if(qm != null) {
-			QueueMessage older = this.myMessages.putIfAbsent(message, qm);
-			if(older != null) {
-				older.incrementPriority(priority);
-			}
+		if(qm == null) {
+			LOGGER.debug("Unable to add message to queue: {}", message);
+			return null;
+		}
+		
+		QueueMessage older = this.myMessages.putIfAbsent(message, qm);
+		if(older != null) {
+			LOGGER.debug("Concurrency conflict, incrementing priority: {}", message);
+			older.incrementPriority(priority);
+			qm = older;
 		}
 		
 		return qm;
+	}
+	
+	/**
+	 * @see com.sangupta.lineup.queues.AbstractInternalQueue#clear()
+	 */
+	@Override
+	public void clear() {
+		super.clear();
+		
+		// clear the backing map as well
+		myMessages.clear();
 	}
 	
 	/**
@@ -84,6 +109,23 @@ public class PriorityInternalQueue extends AbstractInternalQueue {
 	 */
 	@Override
 	protected void removeMessage(QueueMessage queueMessage) {
-		this.myMessages.remove(queueMessage.getBody());
+		if(queueMessage == null) {
+			return;
+		}
+		
+		QueueMessage qm = this.myMessages.remove(queueMessage.getBody());
+		if(qm == null) {
+			LOGGER.debug("Unable to find a message corresponding to key {} in concurrent-map", queueMessage.getBody());
+			
+			// dump all keys inside the map
+			Enumeration<String> keys = myMessages.keys();
+			StringBuilder builder = new StringBuilder();
+			while(keys.hasMoreElements()) {
+				builder.append(keys.nextElement());
+				builder.append(", ");
+			}
+			
+			LOGGER.debug("Current keys in map: {}", builder.toString());
+		}
 	}
 }

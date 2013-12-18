@@ -63,5 +63,15 @@ public class DuplicateRejectingInternalQueue extends AbstractInternalQueue {
 	protected void removeMessage(QueueMessage queueMessage) {
 		this.myMessages.remove(queueMessage.getBody());
 	}
-	
+
+	/**
+	 * @see com.sangupta.lineup.queues.AbstractInternalQueue#clear()
+	 */
+	@Override
+	public void clear() {
+		super.clear();
+		
+		// internal clearance
+		this.myMessages.clear();
+	}
 }

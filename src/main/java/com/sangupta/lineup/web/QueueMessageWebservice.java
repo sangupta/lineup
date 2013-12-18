@@ -21,6 +21,8 @@
 
 package com.sangupta.lineup.web;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -58,6 +60,7 @@ public class QueueMessageWebservice {
 		return "Yes";
 	}
 	
+	@SuppressWarnings("unchecked")
 	@GET
 	@Path("{secureCode}/{queue}")
 	@Produces(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML })
@@ -89,7 +92,12 @@ public class QueueMessageWebservice {
 		
 		if(messages instanceof QueueMessage) {
 			LOGGER.debug("Read message {} in {} ms.", ((QueueMessage) messages).getBody(), end - start);
+		} else if(messages instanceof List){
+			LOGGER.debug("Read (multiple) {} messages in {} ms.", ((List<QueueMessage>) messages).size(), end - start);
+		} else {
+			LOGGER.debug("Unknown type of message {} read in {} ms.", messages, end - start);
 		}
+		
 		return messages;
 	}
 	
