@@ -21,7 +21,9 @@
 
 package com.sangupta.lineup.queues;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -38,9 +40,20 @@ import com.sangupta.lineup.domain.QueueMessage;
  */
 public class PriorityInternalQueue extends AbstractInternalQueue {
 	
+	/**
+	 * Logger
+	 */
 	private final static Logger LOGGER = LoggerFactory.getLogger(PriorityInternalQueue.class);
 	
+	/**
+	 * Current entries in the map
+	 */
 	private final ConcurrentHashMap<String, QueueMessage> myMessages = new ConcurrentHashMap<String, QueueMessage>();
+	
+	/**
+	 * Keys that need to be removed
+	 */
+	private final List<String> keysToBeRemoved = new ArrayList<String>();
 	
 	/**
 	 * Construct this queue.
@@ -64,6 +77,14 @@ public class PriorityInternalQueue extends AbstractInternalQueue {
 	 */
 	@Override
 	public QueueMessage addMessage(final String message, int delaySeconds, int priority) {
+		// clear up any previous backlog
+		if(!this.keysToBeRemoved.isEmpty()) {
+			for(final String key : this.keysToBeRemoved) {
+				this.myMessages.remove(key);
+			}
+		}
+		
+		// now look up if we want to add the message
 		if(this.myMessages.containsKey(message)) {
 			// increase its priority
 			QueueMessage qm = this.myMessages.get(message);
@@ -101,7 +122,7 @@ public class PriorityInternalQueue extends AbstractInternalQueue {
 		super.clear();
 		
 		// clear the backing map as well
-		myMessages.clear();
+		this.myMessages.clear();
 	}
 	
 	/**
@@ -116,6 +137,9 @@ public class PriorityInternalQueue extends AbstractInternalQueue {
 		QueueMessage qm = this.myMessages.remove(queueMessage.getBody());
 		if(qm == null) {
 			LOGGER.debug("Unable to find a message corresponding to key {} in concurrent-map", queueMessage.getBody());
+			
+			// let's clean it up in next thread interaction
+			this.keysToBeRemoved.add(queueMessage.getBody());
 			
 			// dump all keys inside the map
 			Enumeration<String> keys = myMessages.keys();
