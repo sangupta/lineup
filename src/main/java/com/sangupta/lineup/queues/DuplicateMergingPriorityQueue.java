@@ -26,16 +26,28 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import com.sangupta.lineup.domain.QueueMessage;
 
 /**
+ * A {@link PriorityBlockingQueue} implementation that merges duplicate elements and increases
+ * the priority to the combined priority of the duplicate elements.
+ * 
  * @author sangupta
  *
  */
-public class DuplicateMergingPriorityQueue implements BlockingQueue<QueueMessage> {
+public class DuplicateMergingPriorityQueue extends PriorityBlockingQueue<QueueMessage> implements BlockingQueue<QueueMessage> {
 	
+	/**
+	 * Generated via Eclipse
+	 */
+	private static final long serialVersionUID = 3802487984979985654L;
+	
+	/**
+	 * The internal reference set that we use to base our implementation upon
+	 */
 	private final ConcurrentSkipListSet<QueueMessage> internalSet = new ConcurrentSkipListSet<QueueMessage>();
 	
 	/**
@@ -93,12 +105,13 @@ public class DuplicateMergingPriorityQueue implements BlockingQueue<QueueMessage
 	}
 
 	/**
+	 * Returns an iterator that retrieves the elements with highest priority first.
+	 * 
 	 * @see java.util.Collection#iterator()
 	 */
 	@Override
 	public Iterator<QueueMessage> iterator() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.internalSet.descendingIterator();
 	}
 
 	/**
@@ -106,8 +119,7 @@ public class DuplicateMergingPriorityQueue implements BlockingQueue<QueueMessage
 	 */
 	@Override
 	public Object[] toArray() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.internalSet.toArray();
 	}
 
 	/**
@@ -115,8 +127,7 @@ public class DuplicateMergingPriorityQueue implements BlockingQueue<QueueMessage
 	 */
 	@Override
 	public <T> T[] toArray(T[] a) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.internalSet.toArray(a);
 	}
 
 	/**
@@ -124,17 +135,27 @@ public class DuplicateMergingPriorityQueue implements BlockingQueue<QueueMessage
 	 */
 	@Override
 	public boolean containsAll(Collection<?> c) {
-		// TODO Auto-generated method stub
-		return false;
+		return this.internalSet.containsAll(c);
 	}
 
 	/**
+	 * This is a trickier method. Adding elements may reject duplicates
+	 * and thus we need to do it one by one, so that we can increase priority
+	 * of duplicates.
+	 * 
 	 * @see java.util.Collection#addAll(java.util.Collection)
 	 */
 	@Override
 	public boolean addAll(Collection<? extends QueueMessage> c) {
-		// TODO Auto-generated method stub
-		return false;
+		boolean success = true;
+		for(QueueMessage qm : c) {
+			boolean added = add(qm);
+			if(!added) {
+				success = false;
+			}
+		}
+		
+		return success;
 	}
 
 	/**
@@ -142,8 +163,7 @@ public class DuplicateMergingPriorityQueue implements BlockingQueue<QueueMessage
 	 */
 	@Override
 	public boolean removeAll(Collection<?> c) {
-		// TODO Auto-generated method stub
-		return false;
+		return this.internalSet.removeAll(c);
 	}
 
 	/**
@@ -151,8 +171,7 @@ public class DuplicateMergingPriorityQueue implements BlockingQueue<QueueMessage
 	 */
 	@Override
 	public boolean retainAll(Collection<?> c) {
-		// TODO Auto-generated method stub
-		return false;
+		return this.internalSet.retainAll(c);
 	}
 
 	/**
@@ -183,7 +202,7 @@ public class DuplicateMergingPriorityQueue implements BlockingQueue<QueueMessage
 	 * @see java.util.concurrent.BlockingQueue#put(java.lang.Object)
 	 */
 	@Override
-	public void put(QueueMessage e) throws InterruptedException {
+	public void put(QueueMessage e) {
 		this.internalSet.add(e);		
 	}
 
@@ -191,7 +210,7 @@ public class DuplicateMergingPriorityQueue implements BlockingQueue<QueueMessage
 	 * @see java.util.concurrent.BlockingQueue#offer(java.lang.Object, long, java.util.concurrent.TimeUnit)
 	 */
 	@Override
-	public boolean offer(QueueMessage e, long timeout, TimeUnit unit) throws InterruptedException {
+	public boolean offer(QueueMessage e, long timeout, TimeUnit unit) {
 		return this.internalSet.add(e);
 	}
 
@@ -200,7 +219,6 @@ public class DuplicateMergingPriorityQueue implements BlockingQueue<QueueMessage
 	 */
 	@Override
 	public QueueMessage take() throws InterruptedException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -242,7 +260,15 @@ public class DuplicateMergingPriorityQueue implements BlockingQueue<QueueMessage
 	 */
 	@Override
 	public int drainTo(Collection<? super QueueMessage> c) {
-		throw new RuntimeException("Method not yet implemented");
+		Iterator<QueueMessage> iterator = this.internalSet.descendingIterator();
+		
+		int count = 0;
+		while(iterator.hasNext()) {
+			c.add(iterator.next());
+			count++;
+		}
+		
+		return count;
 	}
 
 	/**
@@ -250,7 +276,19 @@ public class DuplicateMergingPriorityQueue implements BlockingQueue<QueueMessage
 	 */
 	@Override
 	public int drainTo(Collection<? super QueueMessage> c, int maxElements) {
-		throw new RuntimeException("Method not yet implemented");
+		Iterator<QueueMessage> iterator = this.internalSet.descendingIterator();
+		
+		int count = 0;
+		while(iterator.hasNext()) {
+			c.add(iterator.next());
+			count++;
+			
+			if(count == maxElements) {
+				return count;
+			}
+		}
+		
+		return count;
 	}
 
 }
