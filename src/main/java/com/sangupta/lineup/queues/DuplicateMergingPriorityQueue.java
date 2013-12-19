@@ -21,11 +21,14 @@
 
 package com.sangupta.lineup.queues;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.ConcurrentNavigableMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -43,21 +46,34 @@ public class DuplicateMergingPriorityQueue extends PriorityBlockingQueue<QueueMe
 	/**
 	 * Generated via Eclipse
 	 */
-	private static final long serialVersionUID = 3802487984979985654L;
+	private static final long serialVersionUID = 6135795995864762574L;
+
+	/**
+     * The maximum size of array to allocate.
+     * Some VMs reserve some header words in an array.
+     * Attempts to allocate larger arrays may result in
+     * OutOfMemoryError: Requested array size exceeds VM limit
+     */
+    private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 	
 	/**
-	 * The internal reference set that we use to base our implementation upon
-	 */
-	private final ConcurrentSkipListSet<QueueMessage> internalSet = new ConcurrentSkipListSet<QueueMessage>();
+     * The underlying map. Uses Boolean.TRUE as value for each
+     * element.  This field is declared final for the sake of thread
+     * safety, which entails some ugliness in clone()
+     */
+    private final ConcurrentNavigableMap<QueueMessage, QueueMessage> internalMap = new ConcurrentSkipListMap<QueueMessage, QueueMessage>();
 	
 	/**
 	 * @see java.util.Queue#remove()
 	 */
 	@Override
 	public QueueMessage remove() {
-		QueueMessage qm = this.internalSet.last();
-		this.internalSet.remove(qm);
-		return qm;
+		Entry<QueueMessage, QueueMessage> entry = this.internalMap.pollLastEntry();
+		if(entry != null) {
+			return entry.getKey();
+		}
+		
+		throw new NoSuchElementException();
 	}
 
 	/**
@@ -65,7 +81,12 @@ public class DuplicateMergingPriorityQueue extends PriorityBlockingQueue<QueueMe
 	 */
 	@Override
 	public QueueMessage poll() {
-		return this.internalSet.pollLast();
+		Entry<QueueMessage, QueueMessage> entry = this.internalMap.pollLastEntry();
+		if(entry != null) {
+			return entry.getKey();
+		}
+		
+		return null;
 	}
 
 	/**
@@ -73,7 +94,7 @@ public class DuplicateMergingPriorityQueue extends PriorityBlockingQueue<QueueMe
 	 */
 	@Override
 	public QueueMessage element() {
-		return this.internalSet.last();
+		return this.internalMap.lastKey();
 	}
 
 	/**
@@ -82,7 +103,7 @@ public class DuplicateMergingPriorityQueue extends PriorityBlockingQueue<QueueMe
 	@Override
 	public QueueMessage peek() {
 		try {
-			return this.internalSet.last();
+			return this.internalMap.lastKey();
 		} catch(NoSuchElementException e) {
 			return null;
 		}
@@ -93,7 +114,7 @@ public class DuplicateMergingPriorityQueue extends PriorityBlockingQueue<QueueMe
 	 */
 	@Override
 	public int size() {
-		return this.internalSet.size();
+		return this.internalMap.size();
 	}
 
 	/**
@@ -101,7 +122,7 @@ public class DuplicateMergingPriorityQueue extends PriorityBlockingQueue<QueueMe
 	 */
 	@Override
 	public boolean isEmpty() {
-		return this.internalSet.isEmpty();
+		return this.internalMap.isEmpty();
 	}
 
 	/**
@@ -111,7 +132,7 @@ public class DuplicateMergingPriorityQueue extends PriorityBlockingQueue<QueueMe
 	 */
 	@Override
 	public Iterator<QueueMessage> iterator() {
-		return this.internalSet.descendingIterator();
+		return this.internalMap.descendingKeySet().descendingIterator();
 	}
 
 	/**
@@ -119,7 +140,15 @@ public class DuplicateMergingPriorityQueue extends PriorityBlockingQueue<QueueMe
 	 */
 	@Override
 	public Object[] toArray() {
-		return this.internalSet.toArray();
+		// Estimate size of array; be prepared to see more or fewer elements
+        Object[] r = new Object[size()];
+        Iterator<QueueMessage> it = iterator();
+        for (int i = 0; i < r.length; i++) {
+            if (! it.hasNext()) // fewer elements than expected
+                return Arrays.copyOf(r, i);
+            r[i] = it.next();
+        }
+        return it.hasNext() ? finishToArray(r, it) : r;
 	}
 
 	/**
@@ -127,15 +156,72 @@ public class DuplicateMergingPriorityQueue extends PriorityBlockingQueue<QueueMe
 	 */
 	@Override
 	public <T> T[] toArray(T[] a) {
-		return this.internalSet.toArray(a);
+		// Estimate size of array; be prepared to see more or fewer elements
+        int size = size();
+        T[] r = a.length >= size ? a : (T[]) java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), size);
+        Iterator<QueueMessage> it = iterator();
+
+        for (int i = 0; i < r.length; i++) {
+            if (! it.hasNext()) { // fewer elements than expected
+                if (a != r)
+                    return Arrays.copyOf(r, i);
+                r[i] = null; // null-terminate
+                return r;
+            }
+            r[i] = (T) it.next();
+        }
+        return it.hasNext() ? finishToArray(r, it) : r;
 	}
+	
+	 /**
+     * Reallocates the array being used within toArray when the iterator
+     * returned more elements than expected, and finishes filling it from
+     * the iterator.
+     *
+     * @param r the array, replete with previously stored elements
+     * @param it the in-progress iterator over this collection
+     * @return array containing the elements in the given array, plus any
+     *         further elements returned by the iterator, trimmed to size
+     */
+    private static <T> T[] finishToArray(T[] r, Iterator<?> it) {
+        int i = r.length;
+        while (it.hasNext()) {
+            int cap = r.length;
+            if (i == cap) {
+                int newCap = cap + (cap >> 1) + 1;
+                // overflow-conscious code
+                if (newCap - MAX_ARRAY_SIZE > 0)
+                    newCap = hugeCapacity(cap + 1);
+                r = Arrays.copyOf(r, newCap);
+            }
+            r[i++] = (T) it.next();
+        }
+        // trim if overallocated
+        return (i == r.length) ? r : Arrays.copyOf(r, i);
+    }
+
+    private static int hugeCapacity(int minCapacity) {
+        if (minCapacity < 0) // overflow
+            throw new OutOfMemoryError
+                ("Required array size too large");
+        return (minCapacity > MAX_ARRAY_SIZE) ?
+            Integer.MAX_VALUE :
+            MAX_ARRAY_SIZE;
+    }
 
 	/**
 	 * @see java.util.Collection#containsAll(java.util.Collection)
 	 */
 	@Override
 	public boolean containsAll(Collection<?> c) {
-		return this.internalSet.containsAll(c);
+        for (Object e : c) {
+            if (!contains(e)) {
+                return false;
+            }
+        }
+        
+        return true;
+
 	}
 
 	/**
@@ -163,7 +249,15 @@ public class DuplicateMergingPriorityQueue extends PriorityBlockingQueue<QueueMe
 	 */
 	@Override
 	public boolean removeAll(Collection<?> c) {
-		return this.internalSet.removeAll(c);
+		boolean modified = false;
+        Iterator<QueueMessage> it = iterator();
+        while (it.hasNext()) {
+            if (c.contains(it.next())) {
+                it.remove();
+                modified = true;
+            }
+        }
+        return modified;
 	}
 
 	/**
@@ -171,7 +265,15 @@ public class DuplicateMergingPriorityQueue extends PriorityBlockingQueue<QueueMe
 	 */
 	@Override
 	public boolean retainAll(Collection<?> c) {
-		return this.internalSet.retainAll(c);
+		boolean modified = false;
+        Iterator<QueueMessage> it = iterator();
+        while (it.hasNext()) {
+            if (!c.contains(it.next())) {
+                it.remove();
+                modified = true;
+            }
+        }
+        return modified;
 	}
 
 	/**
@@ -179,15 +281,26 @@ public class DuplicateMergingPriorityQueue extends PriorityBlockingQueue<QueueMe
 	 */
 	@Override
 	public void clear() {
-		this.internalSet.clear();
+		this.internalMap.clear();
 	}
 
 	/**
+	 * This is a special method - which takes care that if the message already
+	 * exists in the queue it will increment the existing message priority by 
+	 * the priority of the message provided to be added.
+	 * 
 	 * @see java.util.concurrent.BlockingQueue#add(java.lang.Object)
 	 */
 	@Override
 	public boolean add(QueueMessage e) {
-		return this.internalSet.add(e);
+		QueueMessage older = this.internalMap.putIfAbsent(e, e);
+		if(older == null) {
+			return true;
+		}
+		
+		// retrieve the original message itself and increase priority
+		older.incrementPriority(e.getPriority());
+		return true;
 	}
 
 	/**
@@ -195,7 +308,7 @@ public class DuplicateMergingPriorityQueue extends PriorityBlockingQueue<QueueMe
 	 */
 	@Override
 	public boolean offer(QueueMessage e) {
-		return this.internalSet.add(e);
+		return this.add(e);
 	}
 
 	/**
@@ -203,7 +316,7 @@ public class DuplicateMergingPriorityQueue extends PriorityBlockingQueue<QueueMe
 	 */
 	@Override
 	public void put(QueueMessage e) {
-		this.internalSet.add(e);		
+		this.add(e);		
 	}
 
 	/**
@@ -211,7 +324,7 @@ public class DuplicateMergingPriorityQueue extends PriorityBlockingQueue<QueueMe
 	 */
 	@Override
 	public boolean offer(QueueMessage e, long timeout, TimeUnit unit) {
-		return this.internalSet.add(e);
+		return this.add(e);
 	}
 
 	/**
@@ -219,7 +332,20 @@ public class DuplicateMergingPriorityQueue extends PriorityBlockingQueue<QueueMe
 	 */
 	@Override
 	public QueueMessage take() throws InterruptedException {
-		return null;
+		Entry<QueueMessage, QueueMessage> qm = null;
+		do {
+			if(!this.internalMap.isEmpty()) {
+				try {
+					qm = this.internalMap.pollLastEntry();
+				} catch(NoSuchElementException e) {
+					// eat up
+				}
+				
+				if(qm != null) {
+					return qm.getKey();
+				}
+			}
+		} while(true);
 	}
 
 	/**
@@ -227,8 +353,27 @@ public class DuplicateMergingPriorityQueue extends PriorityBlockingQueue<QueueMe
 	 */
 	@Override
 	public QueueMessage poll(long timeout, TimeUnit unit) throws InterruptedException {
-		// TODO Auto-generated method stub
-		return null;
+		long nanos = unit.toNanos(timeout);
+		long start = System.nanoTime();
+		
+		Entry<QueueMessage, QueueMessage> qm = null;
+		do {
+			if((System.nanoTime() - start) > nanos) {
+				return null;
+			}
+			
+			if(!this.internalMap.isEmpty()) {
+				try {
+					qm = this.internalMap.pollLastEntry();
+				} catch(NoSuchElementException e) {
+					// eat up
+				}
+				
+				if(qm != null) {
+					return qm.getKey();
+				}
+			}
+		} while(true);
 	}
 
 	/**
@@ -244,7 +389,12 @@ public class DuplicateMergingPriorityQueue extends PriorityBlockingQueue<QueueMe
 	 */
 	@Override
 	public boolean remove(Object o) {
-		return this.internalSet.remove(o);
+		QueueMessage qm = this.internalMap.remove(o);
+		if(qm != null) {
+			return true;
+		}
+		
+		return false;
 	}
 
 	/**
@@ -252,7 +402,7 @@ public class DuplicateMergingPriorityQueue extends PriorityBlockingQueue<QueueMe
 	 */
 	@Override
 	public boolean contains(Object o) {
-		return this.internalSet.contains(o);
+		return this.internalMap.containsKey(o);
 	}
 
 	/**
@@ -260,7 +410,7 @@ public class DuplicateMergingPriorityQueue extends PriorityBlockingQueue<QueueMe
 	 */
 	@Override
 	public int drainTo(Collection<? super QueueMessage> c) {
-		Iterator<QueueMessage> iterator = this.internalSet.descendingIterator();
+		Iterator<QueueMessage> iterator = this.iterator();
 		
 		int count = 0;
 		while(iterator.hasNext()) {
@@ -276,7 +426,7 @@ public class DuplicateMergingPriorityQueue extends PriorityBlockingQueue<QueueMe
 	 */
 	@Override
 	public int drainTo(Collection<? super QueueMessage> c, int maxElements) {
-		Iterator<QueueMessage> iterator = this.internalSet.descendingIterator();
+		Iterator<QueueMessage> iterator = this.iterator();
 		
 		int count = 0;
 		while(iterator.hasNext()) {

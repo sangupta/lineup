@@ -22,6 +22,7 @@
 package com.sangupta.lineup.domain;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.sangupta.jerry.util.AssertUtils;
 import com.sangupta.jerry.util.CryptoUtil;
@@ -34,6 +35,11 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  */
 @XStreamAlias("queueMessage")
 public class QueueMessage implements Comparable<QueueMessage> {
+	
+	/**
+	 * Auto incrementing message ID that allows us to always use a unique message ID
+	 */
+	private static final AtomicLong AUTO_INCREMENT_MESSAGE_ID = new AtomicLong(1);
 	
 	/**
 	 * Unique message ID for this message
@@ -66,25 +72,6 @@ public class QueueMessage implements Comparable<QueueMessage> {
 	private final AtomicInteger priority;
 	
 	/**
-	 * Default internal constructor
-	 * 
-	 */
-	private QueueMessage(long messageID, String body, int delaySeconds) {
-		this.messageID = messageID;
-		this.body = body;
-		this.delaySeconds = delaySeconds;
-		
-		if(body != null) {
-			this.md5 = CryptoUtil.getMD5Hex(body);
-		} else {
-			this.md5 = null;
-		}
-		
-		this.created = System.currentTimeMillis();
-		this.priority = new AtomicInteger(0);
-	}
-	
-	/**
 	 * Increment the priority of this message by one.
 	 * 
 	 */
@@ -112,7 +99,7 @@ public class QueueMessage implements Comparable<QueueMessage> {
 			throw new IllegalArgumentException("MessageID cannot be less than or equal to ZERO");
 		}
 		
-		return new QueueMessage(messageID, null, -1); 
+		return new QueueMessage(messageID, null, -1, 1); 
 	}
 	
 	/**
@@ -126,7 +113,7 @@ public class QueueMessage implements Comparable<QueueMessage> {
 			throw new IllegalArgumentException("Message body cannot be null or empty.");
 		}
 
-		return new QueueMessage(-1, null, -1);
+		return new QueueMessage(AUTO_INCREMENT_MESSAGE_ID.getAndIncrement(), null, -1, 1);
 	}
 	
 	/**
@@ -136,7 +123,7 @@ public class QueueMessage implements Comparable<QueueMessage> {
 	 * @param priority
 	 */
 	public QueueMessage(String body, int delaySeconds, int priority) {
-		this(1, body, delaySeconds, priority);
+		this(AUTO_INCREMENT_MESSAGE_ID.getAndIncrement(), body, delaySeconds, priority);
 	}
 
 	/**
@@ -186,12 +173,9 @@ public class QueueMessage implements Comparable<QueueMessage> {
 		}
 		
 		QueueMessage qm = (QueueMessage) obj;
-		if(this.messageID != -1 && qm.messageID != -1) {
-			return this.messageID == qm.messageID;
-		}
 		
 		if(this.md5 != null && qm.md5 != null) {
-			if(this.md5.equals(qm.md5)) {
+			if(!this.md5.equals(qm.md5)) {
 				return false;
 			}
 			
@@ -206,7 +190,7 @@ public class QueueMessage implements Comparable<QueueMessage> {
 	 */
 	@Override
 	public int hashCode() {
-		return (int) this.messageID;
+		return (int)(this.messageID ^ (this.messageID >>> 32));
 	}
 	
 	/**
