@@ -23,6 +23,7 @@ package com.sangupta.lineup.queues;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -79,8 +80,9 @@ public class PriorityInternalQueue extends AbstractInternalQueue {
 	public QueueMessage addMessage(final String message, int delaySeconds, int priority) {
 		// clear up any previous backlog
 		if(!this.keysToBeRemoved.isEmpty()) {
-			for(final String key : this.keysToBeRemoved) {
-				this.myMessages.remove(key);
+			Iterator<String> keyToRemove = this.keysToBeRemoved.iterator();
+			while(keyToRemove.hasNext()) {
+				this.myMessages.remove(keyToRemove.next());
 			}
 		}
 		
