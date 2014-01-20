@@ -80,12 +80,12 @@ public class PriorityInternalQueue extends AbstractInternalQueue {
 	public QueueMessage addMessage(final String message, int delaySeconds, int priority) {
 		// clear up any previous backlog
 		if(!this.keysToBeRemoved.isEmpty()) {
-			Iterator<String> iterator = this.keysToBeRemoved.iterator();
-			while(iterator.hasNext()) {
-				this.myMessages.remove(iterator.next());
+			Iterator<String> keyToRemove = this.keysToBeRemoved.iterator();
+			
+			while(keyToRemove.hasNext()) {
+				this.myMessages.remove(keyToRemove.next());
 				
-				// also remove it from the list itself
-				iterator.remove();
+				keyToRemove.remove();
 			}
 		}
 		
