@@ -23,6 +23,7 @@ package com.sangupta.lineup.queues;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -79,8 +80,12 @@ public class PriorityInternalQueue extends AbstractInternalQueue {
 	public QueueMessage addMessage(final String message, int delaySeconds, int priority) {
 		// clear up any previous backlog
 		if(!this.keysToBeRemoved.isEmpty()) {
-			for(final String key : this.keysToBeRemoved) {
-				this.myMessages.remove(key);
+			Iterator<String> iterator = this.keysToBeRemoved.iterator();
+			while(iterator.hasNext()) {
+				this.myMessages.remove(iterator.next());
+				
+				// also remove it from the list itself
+				iterator.remove();
 			}
 		}
 		
@@ -142,14 +147,16 @@ public class PriorityInternalQueue extends AbstractInternalQueue {
 			this.keysToBeRemoved.add(queueMessage.getBody());
 			
 			// dump all keys inside the map
-			Enumeration<String> keys = myMessages.keys();
-			StringBuilder builder = new StringBuilder();
-			while(keys.hasMoreElements()) {
-				builder.append(keys.nextElement());
-				builder.append(", ");
+			if(LOGGER.isDebugEnabled()) {
+				Enumeration<String> keys = myMessages.keys();
+				StringBuilder builder = new StringBuilder();
+				while(keys.hasMoreElements()) {
+					builder.append(keys.nextElement());
+					builder.append(", ");
+				}
+				
+				LOGGER.debug("Current keys in map: {}", builder.toString());
 			}
-			
-			LOGGER.debug("Current keys in map: {}", builder.toString());
 		}
 	}
 }
