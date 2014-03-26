@@ -84,7 +84,7 @@ public class DuplicateRejectingLineUpQueue extends AbstractLineUpQueue {
 			return qm;
 		}
 		
-		this.currentMessages.remove(qm.getBody());
+		this.currentMessages.remove(qm);
 		return qm;
 	}
 

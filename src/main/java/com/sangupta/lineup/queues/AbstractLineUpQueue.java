@@ -314,7 +314,7 @@ public abstract class AbstractLineUpQueue implements LineUpQueue {
 	 */
 	@Override
 	public boolean isEmpty() {
-		throw new RuntimeException("Method not supported");
+		return this.numMessages() == 0;
 	}
 
 	/**

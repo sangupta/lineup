@@ -183,7 +183,34 @@ public class QueueMessage implements Comparable<QueueMessage> {
 			return -1;
 		}
 		
-		return 0 - (this.priority.get() - queueMessage.priority.get());
+		if(this == queueMessage) {
+			return 0;
+		}
+		
+		int myPriority = this.priority.get();
+		int hisPriority = queueMessage.priority.get();
+		
+		if(myPriority == hisPriority) {
+			if(this.messageID < queueMessage.messageID) {
+				return -1;
+			}
+			
+			if(this.messageID > queueMessage.messageID) {
+				return 1;
+			}
+			
+			return 0;
+		}
+		
+		return 0 - (myPriority - hisPriority);
+	}
+	
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "[QueueMessage: " + this.body + "]";
 	}
 	
 	// Usual accessors follow
