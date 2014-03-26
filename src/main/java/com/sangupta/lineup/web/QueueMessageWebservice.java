@@ -1,9 +1,9 @@
 /**
  *
  * lineup - In-Memory high-throughput queue
- * Copyright (c) 2013, Sandeep Gupta
+ * Copyright (c) 2013-2014, Sandeep Gupta
  * 
- * http://www.sangupta/projects/lineup
+ * http://sangupta.com/projects/lineup
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,11 +38,12 @@ import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sangupta.jerry.http.HttpStatusCode;
+import com.sangupta.jerry.constants.HttpStatusCode;
+import com.sangupta.jerry.util.AssertUtils;
 import com.sangupta.lineup.LineUp;
-import com.sangupta.lineup.domain.DefaultLineUpQueue;
 import com.sangupta.lineup.domain.QueueMessage;
 import com.sangupta.lineup.exceptions.QueueNotFoundException;
+import com.sangupta.lineup.queues.LineUpQueue;
 
 /**
  * @author sangupta
@@ -63,11 +64,11 @@ public class QueueMessageWebservice {
 	@SuppressWarnings("unchecked")
 	@GET
 	@Path("{secureCode}/{queue}")
-	@Produces(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML })
+	@Produces(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 	public Object getMessage(@PathParam("secureCode") String securityCode, @PathParam("queue") String queueName, 
 			@DefaultValue("1") @QueryParam("numMessages") int numMessages, @DefaultValue("0") @QueryParam("pollTime") long pollTime) {
 		
-		DefaultLineUpQueue queue;
+		LineUpQueue queue;
 		try {
 			queue = LineUp.getQueue(queueName, securityCode);
 		} catch (QueueNotFoundException e) {
@@ -108,7 +109,7 @@ public class QueueMessageWebservice {
 	 * @param pollTime
 	 * @return
 	 */
-	private Object getMessageFromQueue(DefaultLineUpQueue queue, int numMessages, long pollTime) {
+	private Object getMessageFromQueue(LineUpQueue queue, int numMessages, long pollTime) {
 		if(numMessages == 1) {
 			if(pollTime == 0) {
 				return queue.getMessage();
@@ -126,15 +127,15 @@ public class QueueMessageWebservice {
 	
 	@POST
 	@Path("{secureCode}/{queue}")
-	@Produces(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML })
-	@Consumes(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML })
+	@Produces(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+	@Consumes(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 	public QueueMessage postMessage(@PathParam("secureCode") String securityCode, @PathParam("queue") String queueName, QueueMessage message) {
 		if(message == null) {
 			throw new WebApplicationException(HttpStatusCode.BAD_REQUEST);
 		}
 		
 		try {
-			DefaultLineUpQueue queue = LineUp.getQueue(queueName, securityCode);
+			LineUpQueue queue = LineUp.getQueue(queueName, securityCode);
 			return queue.addMessage(message);
 		} catch (QueueNotFoundException e) {
 			throw new WebApplicationException(HttpStatusCode.NOT_FOUND);
@@ -144,15 +145,15 @@ public class QueueMessageWebservice {
 	@DELETE
 	@Path("{secureCode}/{queue}")
 	@Produces(MediaType.TEXT_PLAIN)
-	@Consumes(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML })
-	public String deleteMessage(@PathParam("secureCode") String securityCode, @PathParam("queue") String queueName, QueueMessage message) {
-		if(message == null) {
+	@Consumes(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+	public String deleteMessage(@PathParam("secureCode") String securityCode, @PathParam("queue") String queueName, String messageID) {
+		if(AssertUtils.isEmpty(messageID)) {
 			throw new WebApplicationException(HttpStatusCode.BAD_REQUEST);
 		}
 		
 		try {
-			DefaultLineUpQueue queue = LineUp.getQueue(queueName, securityCode);
-			boolean success = queue.deleteMessage(String.valueOf(message.getMessageID()));
+			LineUpQueue queue = LineUp.getQueue(queueName, securityCode);
+			boolean success = queue.deleteMessage(messageID);
 			if(success) {
 				return "done";
 			}

@@ -19,22 +19,39 @@
  * 
  */
 
-package com.sangupta.lineup.domain;
+package com.sangupta.lineup.queues;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 import com.sangupta.lineup.LineUp;
+import com.sangupta.lineup.domain.QueueMessage;
 
 /**
  * Contract for any queue implementation that needs to serve in the
- * {@link LineUp} infrastructure.
+ * {@link LineUp} infrastructure. All {@link LineUpQueue}s are blocking in
+ * nature. They are usually not bound by a limit and can accept any number of
+ * incoming messages.
  * 
  * @author sangupta
- * 
+ * @since 0.1.0
  */
 public interface LineUpQueue extends BlockingQueue<QueueMessage> {
 	
+	/**
+	 * Return the name associated with this queue.
+	 * 
+	 * @return
+	 */
+	public String getName();
+	
+	/**
+	 * Return the security code associated with this queue.
+	 * 
+	 * @return
+	 */
+	public String getSecurityCode();
+
 	/**
 	 * Add a message to the internal queue.
 	 * 
@@ -62,6 +79,24 @@ public interface LineUpQueue extends BlockingQueue<QueueMessage> {
 	 */
 	public QueueMessage addMessage(String message, int delaySeconds);
 	
+	/**
+	 * Add a message to the internal queue with the given delay.
+	 * 
+	 * @param message
+	 *            the {@link String} message that needs to be added to the queue
+	 * 
+	 * @param delaySeconds
+	 *            the time after which the message is made available in the
+	 *            queue
+	 * 
+	 * @param priority
+	 *            the priority of the incoming message, the higher the priority
+	 *            the earlier it is given to the clients
+	 * 
+	 * 
+	 * @return the {@link QueueMessage} instance that was added,
+	 *         <code>null</code> if nothing was added.
+	 */
 	public QueueMessage addMessage(String message, int delaySeconds, int priority);
 	
 	/**
@@ -133,5 +168,5 @@ public interface LineUpQueue extends BlockingQueue<QueueMessage> {
 	 * 
 	 */
 	public int numMessages();
-
+	
 }

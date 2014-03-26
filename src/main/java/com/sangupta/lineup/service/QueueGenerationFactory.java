@@ -1,9 +1,9 @@
 /**
  *
  * lineup - In-Memory high-throughput queue
- * Copyright (c) 2013, Sandeep Gupta
+ * Copyright (c) 2013-2014, Sandeep Gupta
  * 
- * http://www.sangupta/projects/lineup
+ * http://sangupta.com/projects/lineup
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,21 +21,31 @@
 
 package com.sangupta.lineup.service;
 
-import com.sangupta.lineup.domain.DefaultLineUpQueue;
-import com.sangupta.lineup.domain.DefaultPriorityLineUpQueue;
 import com.sangupta.lineup.domain.QueueOptions;
 import com.sangupta.lineup.domain.QueueType;
-import com.sangupta.lineup.queues.DuplicateAcceptingInternalQueue;
-import com.sangupta.lineup.queues.DuplicateRejectingInternalQueue;
-import com.sangupta.lineup.queues.PriorityInternalQueue;
+import com.sangupta.lineup.queues.DuplicateAcceptingLineUpQueue;
+import com.sangupta.lineup.queues.DuplicateRejectingLineUpQueue;
+import com.sangupta.lineup.queues.LineUpQueue;
+import com.sangupta.lineup.queues.PriorityLineUpQueue;
 
 /**
+ * Factory class to generate new queues depending on the options.
+ * 
  * @author sangupta
- *
+ * @since 0.1.0
  */
 public class QueueGenerationFactory {
 	
-	public static DefaultLineUpQueue getLineUpQueue(String name, String securityCode, QueueOptions options) {
+	/**
+	 * A simple factory method to get the right type of queue based on the {@link QueueOptions}
+	 * given.
+	 * 
+	 * @param name
+	 * @param securityCode
+	 * @param options
+	 * @return
+	 */
+	public static LineUpQueue getLineUpQueue(String name, String securityCode, QueueOptions options) {
 		final QueueType queueType = options.getQueueType();
 		
 		if(queueType == null) {
@@ -44,13 +54,14 @@ public class QueueGenerationFactory {
 		
 		switch (queueType) {
 			case AllowDuplicates:
-				return new DefaultLineUpQueue(name, securityCode, options, new DuplicateAcceptingInternalQueue(options.getDelaySeconds()));
-				
-			case PriorityQueue:
-				return new DefaultPriorityLineUpQueue(name, securityCode, options, new PriorityInternalQueue(options.getDelaySeconds()));
+				return new DuplicateAcceptingLineUpQueue(name, securityCode, options);
 				
 			case RejectDuplicates:
-				return new DefaultLineUpQueue(name, securityCode, options, new DuplicateRejectingInternalQueue(options.getDelaySeconds()));
+				return new DuplicateRejectingLineUpQueue(name, securityCode, options);
+
+			case PriorityQueue:
+				return new PriorityLineUpQueue(name, securityCode, options);
+				
 		}
 		
 		throw new IllegalArgumentException("Queue type is neither null/nor recognized by the system");

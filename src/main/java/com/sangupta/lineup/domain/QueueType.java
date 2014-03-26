@@ -1,9 +1,9 @@
 /**
  *
  * lineup - In-Memory high-throughput queue
- * Copyright (c) 2013, Sandeep Gupta
+ * Copyright (c) 2013-2014, Sandeep Gupta
  * 
- * http://www.sangupta/projects/lineup
+ * http://sangupta.com/projects/lineup
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,39 +24,56 @@ package com.sangupta.lineup.domain;
 import com.sangupta.jerry.util.AssertUtils;
 
 /**
+ * The various types of queues that are supported.
+ * 
  * @author sangupta
- *
+ * @since 0.1.0
  */
 public enum QueueType {
 	
+	/**
+	 * A queue that allows duplicate elements to be added to the queue.
+	 */
 	AllowDuplicates,
 	
+	/**
+	 * A queue that rejects incoming duplicate messages and keeps only unique
+	 * ones. Once a message is consumed, a similar incoming message will again
+	 * be added to the queue.
+	 */
 	RejectDuplicates,
-	
+
+	/**
+	 * A queue that on receiving a duplicate message, increments the priority of
+	 * the existing message and moves it ahead in the queue. This helps in
+	 * making sure that such a message is sent to clients for consumption
+	 * earlier than others in the queue.
+	 */
 	PriorityQueue;
 
 	/**
+	 * A method to convert 
 	 * @param queueType
 	 * @return
 	 */
 	public static QueueType fromString(String queueType) {
 		if(AssertUtils.isEmpty(queueType)) {
-			return null;
+			throw new IllegalArgumentException("Queue type cannot be null/empty");
 		}
 		
-		queueType = queueType.toLowerCase();
-		
-		if(AllowDuplicates.toString().toLowerCase().equals(queueType)) {
+		if("AllowDuplicates".equalsIgnoreCase(queueType)) {
 			return AllowDuplicates;
 		}
 		
-		if(RejectDuplicates.toString().toLowerCase().equals(queueType)) {
+		if("RejectDuplicates".equalsIgnoreCase(queueType)) {
 			return RejectDuplicates;
 		}
-		if(PriorityQueue.toString().toLowerCase().equals(queueType)) {
+		
+		if("PriorityQueue".equalsIgnoreCase(queueType)) {
 			return PriorityQueue;
 		}
-		return null;
+		
+		throw new IllegalArgumentException("Unknown queue type specified as: " + queueType);
 	}
 
 }

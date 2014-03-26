@@ -1,9 +1,9 @@
 /**
  *
  * lineup - In-Memory high-throughput queue
- * Copyright (c) 2013, Sandeep Gupta
+ * Copyright (c) 2013-2014, Sandeep Gupta
  * 
- * http://www.sangupta/projects/lineup
+ * http://sangupta.com/projects/lineup
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.sangupta.jerry.util.AssertUtils;
-import com.sangupta.jerry.util.CryptoUtil;
-import com.sangupta.lineup.queues.PriorityInternalQueue;
+import com.sangupta.jerry.util.HashUtils;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
+ * A simple value object that holds an incoming message and its various properties
+ * like a unique identifier which is assigned to it, the MD5 hash of the message,
+ * the time when it was received and more.
+ * 
  * @author sangupta
- *
+ * @since 0.1.0
  */
 @XStreamAlias("queueMessage")
 public class QueueMessage implements Comparable<QueueMessage> {
@@ -67,77 +70,23 @@ public class QueueMessage implements Comparable<QueueMessage> {
 	private final transient long created;
 	
 	/**
-	 * The priority of this message, in case it being added to the {@link PriorityInternalQueue}.
+	 * The priority of this message, in case it being added to a queue
+	 * which support priority
 	 */
 	private final AtomicInteger priority;
 	
 	/**
-	 * Increment the priority of this message by one.
-	 * 
-	 */
-	public int incrementPriority() {
-		return this.priority.incrementAndGet();
-	}
-	
-	/**
-	 * Increment the priority of this message by given amount.
-	 * 
-	 * @param additive
-	 * @return
-	 */
-	public int incrementPriority(int additive) {
-		return this.priority.addAndGet(additive);
-	}
-	
-	/**
-	 * Create a dummy queue message.
-	 * 
-	 * @param messageID
-	 */
-	public static QueueMessage createMessage(long messageID) {
-		if(messageID <= 0) {
-			throw new IllegalArgumentException("MessageID cannot be less than or equal to ZERO");
-		}
-		
-		return new QueueMessage(messageID, null, -1, 1); 
-	}
-	
-	/**
-	 * Create a dummy queue message that can be used to compare
-	 * the message bodies.
+	 * Create a new queue message. This is the only method that is available to
+	 * clients for constructing a new queue message.
 	 * 
 	 * @param body
-	 */
-	public static QueueMessage createMessage(String body) {
-		if(AssertUtils.isEmpty(body)) {
-			throw new IllegalArgumentException("Message body cannot be null or empty.");
-		}
-
-		return new QueueMessage(AUTO_INCREMENT_MESSAGE_ID.getAndIncrement(), null, -1, 1);
-	}
-	
-	/**
+	 *            the body of the message
 	 * 
-	 * @param body
 	 * @param delaySeconds
-	 * @param priority
+	 *            the delay in seconds before the message is added to the queues
+	 * 
 	 */
 	public QueueMessage(String body, int delaySeconds, int priority) {
-		this(AUTO_INCREMENT_MESSAGE_ID.getAndIncrement(), body, delaySeconds, priority);
-	}
-
-	/**
-	 * Create a new queue message.
-	 * 
-	 * @param messageID
-	 * @param body
-	 * @param delaySeconds
-	 */
-	public QueueMessage(long messageID, String body, int delaySeconds, int priority) {
-		if(messageID <= 0) {
-			throw new IllegalArgumentException("MessageID cannot be less than or equal to ZERO.");
-		}
-		
 		if(AssertUtils.isEmpty(body)) {
 			throw new IllegalArgumentException("Message body cannot be null or empty.");
 		}
@@ -146,13 +95,35 @@ public class QueueMessage implements Comparable<QueueMessage> {
 			throw new IllegalArgumentException("Delay seconds cannot be less than zero.");
 		}
 		
-		this.messageID = messageID;
+		this.messageID = AUTO_INCREMENT_MESSAGE_ID.incrementAndGet();
 		this.body = body;
 		this.delaySeconds = delaySeconds;
-		this.md5 = CryptoUtil.getMD5Hex(body);
+		this.md5 = HashUtils.getMD5Hex(body);
 		
 		this.created = System.currentTimeMillis();
 		this.priority = new AtomicInteger(priority);
+	}
+	
+	/**
+	 * Increment the priority of this message by one. This method only increases
+	 * the priority within this object, moving it to the top of the queue is the
+	 * responsibility of the callee.
+	 * 
+	 */
+	public int incrementPriority() {
+		return this.priority.incrementAndGet();
+	}
+	
+	/**
+	 * Increment the priority of this message by given amount. This method only
+	 * increases the priority within this object, moving it to the top of the
+	 * queue is the responsibility of the callee.
+	 * 
+	 * @param additive
+	 * @return
+	 */
+	public int incrementPriority(int additive) {
+		return this.priority.addAndGet(additive);
 	}
 	
 	/**
@@ -168,21 +139,31 @@ public class QueueMessage implements Comparable<QueueMessage> {
 			return true;
 		}
 		
+		// if we are checking against an id
+		if(obj instanceof Long) {
+			return this.messageID == (Long) obj;
+		}
+		
+		// if we are checking against a message body
+		if(obj instanceof String) {
+			return this.body.equals((String) obj);
+		}
+		
+		// is this a valid message?
 		if(!(obj instanceof QueueMessage)) {
 			return false;
 		}
 		
 		QueueMessage qm = (QueueMessage) obj;
-		
-		if(this.md5 != null && qm.md5 != null) {
-			if(!this.md5.equals(qm.md5)) {
-				return false;
-			}
-			
-			return this.body.equals(qm.body);
+		if(this.messageID == qm.messageID) {
+			return true;
 		}
 		
-		return false;
+		if(!this.md5.equals(qm.md5)) {
+			return false;
+		}
+			
+		return this.body.equals(qm.body);
 	}
 	
 	/**

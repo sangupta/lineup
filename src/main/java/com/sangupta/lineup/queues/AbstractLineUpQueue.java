@@ -19,28 +19,244 @@
  * 
  */
 
-package com.sangupta.lineup.domain;
+package com.sangupta.lineup.queues;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import com.sangupta.jerry.util.AssertUtils;
+import com.sangupta.jerry.util.StringUtils;
+import com.sangupta.lineup.domain.QueueMessage;
+import com.sangupta.lineup.domain.QueueOptions;
 
 /**
- * This class helps {@link LineUpQueue} to wrap inside a normal {@link Queue} object
- * of Java class. This helps us in using these queue's with other Java framework's
- * that utilize a normal queue.
+ * This class helps {@link LineUpQueue} to wrap inside a normal {@link Queue}
+ * object of Java class. This helps us in using these queue's with other Java
+ * framework's that utilize a normal queue.
+ * 
+ * This also serves as a base when rolling out a new {@link LineUpQueue} as the
+ * implementing class needs to implement only a few methods that are specific to
+ * the implementation.
  * 
  * @author sangupta
- *
+ * @since 0.1.0
  */
-public abstract class AbstractLineUpBlockingQueue implements LineUpQueue {
+public abstract class AbstractLineUpQueue implements LineUpQueue {
+	
+	/**
+	 * The default message priority when the incoming message has not specified any.
+	 */
+	protected static final int DEFAULT_MESSAGE_PRIORITY = 1;
 
 	/**
-	 * Remove a message from the queue
+	 * The unique name of this queue.
+	 */
+	protected final String name;
+	
+	/**
+	 * The security code assigned to this queue.
+	 * 
+	 */
+	protected final String securityCode;
+	
+	/**
+	 * The configuration options for this queue.
+	 * 
+	 */
+	protected final transient QueueOptions options;
+	
+	/**
+	 * Convenience constructor - that initializes every known 
+	 * parameter to null. To be used only in case of Remote queues.
+	 * 
+	 */
+	AbstractLineUpQueue() {
+		this.name = null;
+		this.securityCode = null;
+		this.options = null;
+	}
+	
+	/**
+	 * Default constructor.
+	 * 
+	 * @param name
+	 *            the name to assign to this queue
+	 * 
+	 * @param securityCode
+	 *            the security code to assign to this queue. If this is not
+	 *            provided a random security code is generated and assigned to
+	 *            this queue
+	 * 
+	 * @param options
+	 *            the options to use for this queue
+	 * 
+	 * @param internalQueue
+	 *            the internal queue implementation to use
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if either the <code>name</code> or the
+	 *             <code>securityCode</code> is <code>null</code> or
+	 *             <code>empty</code>.
+	 */
+	public AbstractLineUpQueue(String name, String securityCode, QueueOptions options) {
+		if(AssertUtils.isEmpty(name)) {
+			throw new IllegalArgumentException("Queue name cannot be null/empty");
+		}
+		
+		this.name = name;
+		this.options = options;
+		
+		// initialize other params
+		if(securityCode == null) {
+			this.securityCode = UUID.randomUUID().toString();
+		} else {
+			this.securityCode = securityCode;
+		}
+	}
+	
+	/**
+	 * @see com.sangupta.lineup.queues.LineUpQueue#getName()
+	 */
+	@Override
+	public String getName() {
+		return this.name;
+	}
+	
+	/**
+	 * @see com.sangupta.lineup.queues.LineUpQueue#getSecurityCode()
+	 */
+	@Override
+	public String getSecurityCode() {
+		return this.securityCode;
+	}
+
+	/**
+	 * Add a message to the internal queue.
+	 * 
+	 * @param message
+	 *            the {@link String} message that needs to be added to the queue
+	 * 
+	 * @return the {@link QueueMessage} instance that was added,
+	 *         <code>null</code> if nothing was added.
+	 * 
+	 * @see LineUpQueue#addMessage(String)
+	 */
+	@Override
+	public QueueMessage addMessage(String message) {
+		return this.addMessage(message, this.options.getDelaySeconds(), DEFAULT_MESSAGE_PRIORITY);
+	}
+	
+	/**
+	 * Add a message to the internal queue with the given delay.
+	 * 
+	 * @param message
+	 *            the {@link String} message that needs to be added to the queue
+	 * 
+	 * @param delaySeconds
+	 *            the time after which the message is made available in the
+	 *            queue
+	 * 
+	 * @return the {@link QueueMessage} instance that was added,
+	 *         <code>null</code> if nothing was added.
+	 *         
+	 * @see LineUpQueue#addMessage(String, int)
+	 */
+	@Override
+	public QueueMessage addMessage(String message, int delaySeconds) {
+		return this.addMessage(message, delaySeconds, DEFAULT_MESSAGE_PRIORITY);
+	}
+	
+	/**
+	 * Add a message to the internal queue with the given delay.
+	 * 
+	 * @param message
+	 *            the {@link String} message that needs to be added to the queue
+	 * 
+	 * @param delaySeconds
+	 *            the time after which the message is made available in the
+	 *            queue
+	 * 
+	 * @return the {@link QueueMessage} instance that was added,
+	 *         <code>null</code> if nothing was added.
+	 *         
+	 * @see LineUpQueue#addMessage(String, int)
+	 */
+	@Override
+	public QueueMessage addMessage(String message, int delaySeconds, int priority) {
+		QueueMessage qm = new QueueMessage(message, delaySeconds, priority);
+		return this.addMessage(qm);
+	}
+	
+	/**
+	 * Return a message from the queue, without waiting. Returns
+	 * <code>null</code> if the queue is currently empty.
+	 * 
+	 * @return the {@link QueueMessage} instance which is wrapping up the actual
+	 *         message
+	 * 
+	 * @see LineUpQueue#getMessage()
+	 */
+	@Override
+	public QueueMessage getMessage() {
+		try {
+			return this.getMessage(0);
+		} catch(InterruptedException e) {
+			// eat up
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * @see com.sangupta.lineup.queues.LineUpQueue#getMessages(int)
+	 */
+	@Override
+	public List<QueueMessage> getMessages(int numMessages) {
+		List<QueueMessage> list = new ArrayList<QueueMessage>();
+		
+		QueueMessage qm;
+		for(int index = 0; index < numMessages; index++) {
+			qm = this.getMessage();
+			if(qm == null) {
+				break;
+			}
+			
+			list.add(qm);
+		}
+		
+		return list;
+	}
+
+	/**
+	 * 
+	 * @see com.sangupta.lineup.queues.LineUpQueue#deleteMessage(java.lang.String)
+	 */
+	@Override
+	public boolean deleteMessage(String messageID) {
+		long id = StringUtils.getLongValue(messageID, 0);
+		if(id == 0) {
+			return false;
+		}
+		
+		return this.removeMessageID(id);
+	}
+	
+	/**
+	 * Remove the message identified by the given message id.
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public abstract boolean removeMessageID(long id);
+
+	/**
+	 * Remove a message from the head of the queue.
 	 * 
 	 * @return the message that was removed from the queue, <code>null</code> if
 	 *         nothing was removed
@@ -163,14 +379,6 @@ public abstract class AbstractLineUpBlockingQueue implements LineUpQueue {
 	@Override
 	public boolean retainAll(Collection<?> c) {
 		throw new RuntimeException("Method not supported");
-	}
-
-	/**
-	 * @see java.util.Collection#clear()
-	 */
-	@Override
-	public void clear() {
-		throw new RuntimeException("Method not supported");		
 	}
 
 	/**

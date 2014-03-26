@@ -1,9 +1,9 @@
 /**
  *
  * lineup - In-Memory high-throughput queue
- * Copyright (c) 2013, Sandeep Gupta
+ * Copyright (c) 2013-2014, Sandeep Gupta
  * 
- * http://www.sangupta/projects/lineup
+ * http://sangupta.com/projects/lineup
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.sangupta.jerry.util.AssertUtils;
-import com.sangupta.lineup.domain.DefaultLineUpQueue;
 import com.sangupta.lineup.domain.QueueOptions;
 import com.sangupta.lineup.exceptions.QueueAlreadyExistsException;
 import com.sangupta.lineup.exceptions.QueueNotFoundException;
+import com.sangupta.lineup.queues.LineUpQueue;
 import com.sangupta.lineup.service.QueueGenerationFactory;
 import com.sangupta.lineup.service.QueueService;
 
@@ -44,14 +44,14 @@ public class DefaultQueueService implements QueueService {
 	 * Internal map that stores all internal {@link DefaultLineUpQueue} objects.
 	 * 
 	 */
-	private static final ConcurrentHashMap<String, DefaultLineUpQueue> myQueues = new ConcurrentHashMap<String, DefaultLineUpQueue>();
+	private static final ConcurrentHashMap<String, LineUpQueue> myQueues = new ConcurrentHashMap<String, LineUpQueue>();
 	
 	/**
 	 * Create a new queue with default options.
 	 * 
 	 * @see com.sangupta.lineup.service.QueueService#createQueue(java.lang.String)
 	 */
-	public DefaultLineUpQueue createQueue(String name) throws QueueAlreadyExistsException {
+	public LineUpQueue createQueue(String name) throws QueueAlreadyExistsException {
 		return createQueue(name, null, new QueueOptions());
 	}
 	
@@ -59,7 +59,7 @@ public class DefaultQueueService implements QueueService {
 	 * 
 	 * @see com.sangupta.lineup.service.QueueService#createQueue(java.lang.String, java.lang.String)
 	 */
-	public DefaultLineUpQueue createQueue(String name, String securityCode) throws QueueAlreadyExistsException {
+	public LineUpQueue createQueue(String name, String securityCode) throws QueueAlreadyExistsException {
 		return createQueue(name, securityCode, new QueueOptions());
 	}
 
@@ -68,7 +68,7 @@ public class DefaultQueueService implements QueueService {
 	 * @see com.sangupta.lineup.service.QueueService#createQueue(java.lang.String, com.sangupta.lineup.domain.QueueOptions)
 	 */
 	@Override
-	public DefaultLineUpQueue createQueue(String name, QueueOptions options) throws QueueAlreadyExistsException {
+	public LineUpQueue createQueue(String name, QueueOptions options) throws QueueAlreadyExistsException {
 		return createQueue(name, null, options);
 	}
 	
@@ -80,7 +80,7 @@ public class DefaultQueueService implements QueueService {
 	 * @return
 	 * @throws QueueAlreadyExistsException
 	 */
-	public DefaultLineUpQueue createQueue(String name, String securityCode, QueueOptions options) throws QueueAlreadyExistsException {
+	public LineUpQueue createQueue(String name, String securityCode, QueueOptions options) throws QueueAlreadyExistsException {
 		if(AssertUtils.isEmpty(name)) {
 			throw new IllegalArgumentException("Queue name cannot be empty");
 		}
@@ -93,8 +93,8 @@ public class DefaultQueueService implements QueueService {
 			throw new QueueAlreadyExistsException();
 		}
 		
-		DefaultLineUpQueue queue = QueueGenerationFactory.getLineUpQueue(name, securityCode, options);
-		DefaultLineUpQueue previous = myQueues.putIfAbsent(name, queue);
+		LineUpQueue queue = QueueGenerationFactory.getLineUpQueue(name, securityCode, options);
+		LineUpQueue previous = myQueues.putIfAbsent(name, queue);
 		if(previous != null) {
 			throw new QueueAlreadyExistsException();
 		}
@@ -125,7 +125,7 @@ public class DefaultQueueService implements QueueService {
 			throw new QueueNotFoundException();
 		}
 		
-		DefaultLineUpQueue queue = myQueues.get(name);
+		LineUpQueue queue = myQueues.get(name);
 		return queue.getSecurityCode() + "/" + queue.getName();
 	}
 
@@ -156,12 +156,12 @@ public class DefaultQueueService implements QueueService {
 	 * @see com.sangupta.lineup.service.QueueService#getQueue(java.lang.String)
 	 */
 	@Override
-	public DefaultLineUpQueue getQueue(String name, String securityCode) throws QueueNotFoundException {
+	public LineUpQueue getQueue(String name, String securityCode) throws QueueNotFoundException {
 		if(!myQueues.containsKey(name)) {
 			throw new QueueNotFoundException();
 		}
 		
-		DefaultLineUpQueue queue = myQueues.get(name);
+		LineUpQueue queue = myQueues.get(name);
 		if(queue.getSecurityCode().equals(securityCode)) {
 			return queue;
 		}

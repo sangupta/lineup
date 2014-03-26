@@ -1,9 +1,9 @@
 /**
  *
  * lineup - In-Memory high-throughput queue
- * Copyright (c) 2013, Sandeep Gupta
+ * Copyright (c) 2013-2014, Sandeep Gupta
  * 
- * http://www.sangupta/projects/lineup
+ * http://sangupta.com/projects/lineup
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,14 +24,13 @@ package com.sangupta.lineup;
 import java.io.IOException;
 
 import com.sangupta.jerry.util.ConsoleUtils;
-import com.sangupta.lineup.domain.DefaultLineUpQueue;
-import com.sangupta.lineup.domain.LineUpQueue;
 import com.sangupta.lineup.domain.QueueOptions;
 import com.sangupta.lineup.domain.QueueType;
-import com.sangupta.lineup.domain.RemoteLineUpQueue;
 import com.sangupta.lineup.exceptions.QueueAlreadyDeletedException;
 import com.sangupta.lineup.exceptions.QueueAlreadyExistsException;
 import com.sangupta.lineup.exceptions.QueueNotFoundException;
+import com.sangupta.lineup.queues.LineUpQueue;
+import com.sangupta.lineup.queues.RemoteLineUpQueue;
 import com.sangupta.lineup.server.LineUpServer;
 import com.sangupta.lineup.service.QueueService;
 import com.sangupta.lineup.service.impl.DefaultQueueService;
@@ -112,7 +111,7 @@ public class LineUp {
 	 * @return
 	 * @throws QueueAlreadyExistsException 
 	 */
-	public static DefaultLineUpQueue createMessageQueue(String name) throws QueueAlreadyExistsException {
+	public static LineUpQueue createMessageQueue(String name) throws QueueAlreadyExistsException {
 		return QUEUE_SERVICE.createQueue(name);
 	}
 
@@ -124,7 +123,7 @@ public class LineUp {
 	 * @return
 	 * @throws QueueAlreadyExistsException
 	 */
-	public static DefaultLineUpQueue createMessageQueue(String name, String securityCode) throws QueueAlreadyExistsException {
+	public static LineUpQueue createMessageQueue(String name, String securityCode) throws QueueAlreadyExistsException {
 		return QUEUE_SERVICE.createQueue(name, securityCode);
 	}
 	
@@ -136,7 +135,7 @@ public class LineUp {
 	 * @return
 	 * @throws QueueAlreadyExistsException
 	 */
-	public static DefaultLineUpQueue createMessageQueue(String name, QueueType queueType) throws QueueAlreadyExistsException {
+	public static LineUpQueue createMessageQueue(String name, QueueType queueType) throws QueueAlreadyExistsException {
 		return QUEUE_SERVICE.createQueue(name, QueueOptions.getOptions(queueType));
 	}
 	
@@ -149,7 +148,7 @@ public class LineUp {
 	 * @return
 	 * @throws QueueAlreadyExistsException
 	 */
-	public static DefaultLineUpQueue createMessageQueue(String name, String securityCode, QueueType queueType) throws QueueAlreadyExistsException {
+	public static LineUpQueue createMessageQueue(String name, String securityCode, QueueType queueType) throws QueueAlreadyExistsException {
 		return QUEUE_SERVICE.createQueue(name, securityCode, QueueOptions.getOptions(queueType));
 	}
 	
@@ -162,7 +161,7 @@ public class LineUp {
 	 * @return
 	 * @throws QueueAlreadyExistsException
 	 */
-	public static DefaultLineUpQueue createMessageQueue(String name, String securityCode, QueueOptions queueOptions) throws QueueAlreadyExistsException {
+	public static LineUpQueue createMessageQueue(String name, String securityCode, QueueOptions queueOptions) throws QueueAlreadyExistsException {
 		return QUEUE_SERVICE.createQueue(name, securityCode, queueOptions);
 	}
 	
@@ -174,7 +173,7 @@ public class LineUp {
 	 * @return
 	 * @throws QueueNotFoundException
 	 */
-	public static DefaultLineUpQueue getQueue(String name, String securityCode) throws QueueNotFoundException {
+	public static LineUpQueue getQueue(String name, String securityCode) throws QueueNotFoundException {
 		return QUEUE_SERVICE.getQueue(name, securityCode);
 	}
 	

@@ -1,9 +1,9 @@
 /**
  *
  * lineup - In-Memory high-throughput queue
- * Copyright (c) 2013, Sandeep Gupta
+ * Copyright (c) 2013-2014, Sandeep Gupta
  * 
- * http://www.sangupta/projects/lineup
+ * http://sangupta.com/projects/lineup
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,10 @@ package com.sangupta.lineup.domain;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
+ * Various options that specify how a queue should behave.
+ * 
  * @author sangupta
- *
+ * @since 0.1.0
  */
 @XStreamAlias("queueOptions")
 public class QueueOptions {

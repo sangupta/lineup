@@ -21,8 +21,8 @@
 
 package com.sangupta.lineup;
 
-import com.sangupta.lineup.domain.LineUpQueue;
 import com.sangupta.lineup.domain.QueueMessage;
+import com.sangupta.lineup.queues.LineUpQueue;
 import com.sangupta.lineup.server.LineUpServer;
 
 /**

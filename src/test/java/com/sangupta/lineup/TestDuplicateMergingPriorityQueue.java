@@ -24,7 +24,9 @@ package com.sangupta.lineup;
 import java.util.Iterator;
 
 import com.sangupta.lineup.domain.QueueMessage;
-import com.sangupta.lineup.queues.DuplicateMergingPriorityQueue;
+import com.sangupta.lineup.domain.QueueType;
+import com.sangupta.lineup.exceptions.QueueAlreadyExistsException;
+import com.sangupta.lineup.queues.PriorityLineUpQueue;
 
 /**
  * @author sangupta
@@ -32,8 +34,8 @@ import com.sangupta.lineup.queues.DuplicateMergingPriorityQueue;
  */
 public class TestDuplicateMergingPriorityQueue {
 	
-	public static void main(String[] args) {
-		DuplicateMergingPriorityQueue pq = new DuplicateMergingPriorityQueue();
+	public static void main(String[] args) throws QueueAlreadyExistsException {
+		PriorityLineUpQueue pq = (PriorityLineUpQueue) LineUp.createMessageQueue("test", QueueType.PriorityQueue);
 		QueueMessage qm = null;
 		
 		// add more

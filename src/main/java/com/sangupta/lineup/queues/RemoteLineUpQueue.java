@@ -19,7 +19,7 @@
  * 
  */
 
-package com.sangupta.lineup.domain;
+package com.sangupta.lineup.queues;
 
 import java.util.List;
 
@@ -35,12 +35,15 @@ import com.sangupta.jerry.util.AssertUtils;
 import com.sangupta.jerry.util.DateUtils;
 import com.sangupta.jerry.util.UriUtils;
 import com.sangupta.jerry.util.XStreamUtils;
+import com.sangupta.lineup.domain.QueueMessage;
+import com.sangupta.lineup.domain.QueueOptions;
+import com.sangupta.lineup.domain.QueueType;
 
 /**
  * @author sangupta
  *
  */
-public class RemoteLineUpQueue extends AbstractLineUpBlockingQueue {
+public class RemoteLineUpQueue extends AbstractLineUpQueue {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(RemoteLineUpQueue.class);
 	
@@ -57,12 +60,16 @@ public class RemoteLineUpQueue extends AbstractLineUpBlockingQueue {
 	 */
 	private final long messagePollTime;
 	
+	// Various constructors follow
+	
 	/**
 	 * Create a {@link LineUpQueue} that connects to the given remote queue.
 	 * 
 	 * @param queueURL
 	 */
 	public RemoteLineUpQueue(String queueURL) {
+		super("RemoteQueue: "+ queueURL, null, null);
+		
 		if(AssertUtils.isEmpty(queueURL)) {
 			throw new IllegalArgumentException("Remote server URL cannot be null/empty");
 		}
@@ -107,7 +114,7 @@ public class RemoteLineUpQueue extends AbstractLineUpBlockingQueue {
 			throw new RuntimeException("Unable to connect to create a new remote queue."); 
 		}
 		
-		DefaultLineUpQueue queue = (DefaultLineUpQueue) XStreamUtils.getXStream(DefaultLineUpQueue.class).fromXML(response.asStream());
+		LineUpQueue queue = (LineUpQueue) XStreamUtils.getXStream(LineUpQueue.class).fromXML(response.asStream());
 		if(queue == null) {
 			throw new RuntimeException("Unable to connect to create a new remote queue.");
 		}
@@ -233,8 +240,7 @@ public class RemoteLineUpQueue extends AbstractLineUpBlockingQueue {
 	 */
 	@Override
 	public boolean deleteMessage(String messageID) {
-		QueueMessage queueMessage = QueueMessage.createMessage(messageID);
-		String xml = XStreamUtils.getXStream(QueueMessage.class).toXML(queueMessage);
+		String xml = XStreamUtils.getXStream(QueueMessage.class).toXML(messageID);
 		WebResponse response = WebInvoker.invokeUrl(this.remoteQueue, WebRequestMethod.DELETE, MediaType.TEXT_XML, xml);
 		if(response == null) {
 			return false;
@@ -262,4 +268,22 @@ public class RemoteLineUpQueue extends AbstractLineUpBlockingQueue {
 	public String toString() {
 		return this.remoteQueue;
 	}
+
+	/**
+	 * @see java.util.Collection#clear()
+	 */
+	@Override
+	public void clear() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * @see com.sangupta.lineup.queues.AbstractLineUpQueue#removeMessageID(long)
+	 */
+	@Override
+	public boolean removeMessageID(long id) {
+		return false;
+	}
+	
 }

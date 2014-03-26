@@ -1,9 +1,9 @@
 /**
  *
  * lineup - In-Memory high-throughput queue
- * Copyright (c) 2013, Sandeep Gupta
+ * Copyright (c) 2013-2014, Sandeep Gupta
  * 
- * http://www.sangupta/projects/lineup
+ * http://sangupta.com/projects/lineup
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,15 +33,15 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
-import com.sangupta.jerry.http.HttpStatusCode;
+import com.sangupta.jerry.constants.HttpStatusCode;
 import com.sangupta.jerry.util.AssertUtils;
 import com.sangupta.lineup.LineUp;
-import com.sangupta.lineup.domain.DefaultLineUpQueue;
 import com.sangupta.lineup.domain.QueueOptions;
 import com.sangupta.lineup.domain.QueueType;
 import com.sangupta.lineup.exceptions.QueueAlreadyDeletedException;
 import com.sangupta.lineup.exceptions.QueueAlreadyExistsException;
 import com.sangupta.lineup.exceptions.QueueNotFoundException;
+import com.sangupta.lineup.queues.LineUpQueue;
 import com.sangupta.lineup.service.QueueService;
 
 /**
@@ -70,15 +70,15 @@ public class QueueWebservice {
 	
 	@POST
 	@Path("{queue}")
-	@Produces(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML })
-	public DefaultLineUpQueue createPost(@PathParam("queue") String queueName, @DefaultValue("") @QueryParam("queueType") String queueType) {
+	@Produces(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+	public LineUpQueue createPost(@PathParam("queue") String queueName, @DefaultValue("") @QueryParam("queueType") String queueType) {
 		return create(queueName, queueType);
 	}
 	
 	@PUT
 	@Path("{queue}")
-	@Produces(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML })
-	public DefaultLineUpQueue create(@PathParam("queue") String queueName, @DefaultValue("") @QueryParam("queueType") String queueType) {
+	@Produces(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+	public LineUpQueue create(@PathParam("queue") String queueName, @DefaultValue("") @QueryParam("queueType") String queueType) {
 		try {
 			if(AssertUtils.isEmpty(queueType)) {
 				return this.queueService.createQueue(queueName);
@@ -98,7 +98,7 @@ public class QueueWebservice {
 	
 	@DELETE
 	@Path("{queue}")
-	@Produces(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML })
+	@Produces(value = { MediaType.TEXT_XML, MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 	public boolean delete(@PathParam("queue") String queueName) {
 		try {
 			return this.queueService.deleteQueue(queueName);
