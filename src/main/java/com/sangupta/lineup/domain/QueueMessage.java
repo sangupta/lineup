@@ -171,7 +171,7 @@ public class QueueMessage implements Comparable<QueueMessage> {
 	 */
 	@Override
 	public int hashCode() {
-		return (int)(this.messageID ^ (this.messageID >>> 32));
+		return this.body.hashCode();
 	}
 	
 	/**
@@ -191,14 +191,6 @@ public class QueueMessage implements Comparable<QueueMessage> {
 		int hisPriority = queueMessage.priority.get();
 		
 		if(myPriority == hisPriority) {
-			if(this.messageID < queueMessage.messageID) {
-				return -1;
-			}
-			
-			if(this.messageID > queueMessage.messageID) {
-				return 1;
-			}
-			
 			return 0;
 		}
 		

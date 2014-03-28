@@ -35,18 +35,34 @@ import com.sangupta.lineup.domain.QueueMessage;
  */
 public class TestQueueMessage {
 	
+	private static final int MILLION = 1000 * 1000;
+	
 	@Test
 	public void testQueueMessage() {
 		QueueMessage qm1 = new QueueMessage("1", 0, 1);
 		QueueMessage qm2 = new QueueMessage("2", 0, 1);
 		QueueMessage qm11 = new QueueMessage("1", 0, 1);
+		QueueMessage qm12 = new QueueMessage("1", 0, 1);
 		
+		// null check
 		Assert.assertFalse(qm1.equals(null));
-		Assert.assertFalse(qm1.equals(qm2));
-		Assert.assertFalse(qm2.equals(qm1));
+		
+		// reflexive
 		Assert.assertTrue(qm1.equals(qm1));
 		
+		// symmetric
 		Assert.assertTrue(qm1.equals(qm11));
+		Assert.assertTrue(qm11.equals(qm1));
+		
+		// transitive
+		Assert.assertTrue(qm1.equals(qm11));
+		Assert.assertTrue(qm11.equals(qm12));
+		Assert.assertTrue(qm12.equals(qm11));
+		
+		// others
+		Assert.assertFalse(qm1.equals(qm2));
+		Assert.assertFalse(qm2.equals(qm1));
+		
 		Assert.assertTrue(qm1.getMessageID() < qm2.getMessageID());
 		Assert.assertTrue(qm1.getMessageID() < qm11.getMessageID());
 		Assert.assertTrue(qm2.getMessageID() < qm11.getMessageID());
@@ -55,14 +71,45 @@ public class TestQueueMessage {
 		Assert.assertNotNull(qm2.getMd5());
 		Assert.assertNotNull(qm11.getMd5());
 		
+		// compare to
 		Assert.assertTrue(qm1.compareTo(qm1) == 0);
+		Assert.assertTrue(qm1.compareTo(qm2) == 0);
+		Assert.assertTrue(qm1.compareTo(qm11) == 0);
+		Assert.assertTrue(qm1.compareTo(qm12) == 0);
 		
-		Assert.assertFalse(qm1.hashCode() == qm2.hashCode());
+		// hash code
+		Assert.assertTrue(qm1.hashCode() != qm2.hashCode());
+		Assert.assertTrue(qm1.hashCode() == qm11.hashCode());
+		Assert.assertTrue(qm1.hashCode() == qm12.hashCode());
 		
 		ConcurrentSkipListSet<QueueMessage> set = new ConcurrentSkipListSet<QueueMessage>();
 		Assert.assertTrue(set.add(qm1));
 		Assert.assertFalse(set.add(qm1));
 	}
+	
+	@Test
+	public void testMillionMessages() {
+		ConcurrentSkipListSet<QueueMessage> messages = new ConcurrentSkipListSet<QueueMessage>();
+//		Set<QueueMessage> messages = new HashSet<QueueMessage>();
+		QueueMessage qm = new QueueMessage("text", 0, 1);
+		messages.add(qm);
+		for(int index = 0; index < 2 * MILLION; index++) {
+			qm = new QueueMessage("text", 0, 1);
+			if(!messages.contains(qm)) {
+				Assert.assertTrue("failed for index: " + index, false);
+			}
+		}
+	}
+	
+	@Test
+	public void testStrings() {
+		ConcurrentSkipListSet<String> messages = new ConcurrentSkipListSet<String>();
+		messages.add("text");
+		for(int index = 0; index < 2 * MILLION; index++) {
+			if(!messages.contains("text")) {
+				Assert.assertTrue("failed for index: " + index, false);
+			}
+		}
+	}
 
 }
-
