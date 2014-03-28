@@ -24,6 +24,7 @@ package com.sangupta.lineup.domain;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.sangupta.jerry.ds.Prioritizable;
 import com.sangupta.jerry.util.AssertUtils;
 import com.sangupta.jerry.util.HashUtils;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -37,7 +38,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @since 0.1.0
  */
 @XStreamAlias("queueMessage")
-public class QueueMessage implements Comparable<QueueMessage> {
+public class QueueMessage implements Comparable<QueueMessage>, Prioritizable {
 	
 	/**
 	 * Auto incrementing message ID that allows us to always use a unique message ID
