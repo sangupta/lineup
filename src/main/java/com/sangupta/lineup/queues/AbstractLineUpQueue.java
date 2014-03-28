@@ -29,6 +29,7 @@ import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.sangupta.jerry.util.AssertUtils;
 import com.sangupta.jerry.util.StringUtils;
@@ -70,6 +71,11 @@ public abstract class AbstractLineUpQueue implements LineUpQueue {
 	 * 
 	 */
 	protected final transient QueueOptions options;
+	
+	/**
+	 * Maintains the current queue size to skip O(n) computations here
+	 */
+	protected final AtomicInteger queueSize = new AtomicInteger(0);
 	
 	/**
 	 * Convenience constructor - that initializes every known 
@@ -193,6 +199,23 @@ public abstract class AbstractLineUpQueue implements LineUpQueue {
 		return this.addMessage(qm);
 	}
 	
+	@Override
+	public final QueueMessage addMessage(QueueMessage queueMessage) {
+		queueMessage = this.addQueueMessage(queueMessage);
+		if(queueMessage != null) {
+			this.queueSize.incrementAndGet();
+		}
+		
+		return queueMessage;
+	}
+	
+	/**
+	 * 
+	 * @param queueMessage
+	 * @return
+	 */
+	public abstract QueueMessage addQueueMessage(QueueMessage queueMessage);
+	
 	/**
 	 * Return a message from the queue, without waiting. Returns
 	 * <code>null</code> if the queue is currently empty.
@@ -203,7 +226,7 @@ public abstract class AbstractLineUpQueue implements LineUpQueue {
 	 * @see LineUpQueue#getMessage()
 	 */
 	@Override
-	public QueueMessage getMessage() {
+	public final QueueMessage getMessage() {
 		try {
 			return this.getMessage(0);
 		} catch(InterruptedException e) {
@@ -212,6 +235,30 @@ public abstract class AbstractLineUpQueue implements LineUpQueue {
 		
 		return null;
 	}
+	
+	/**
+	 * 
+	 * @param longPollTime
+	 * @return
+	 * @throws InterruptedException
+	 */
+	@Override
+	public final QueueMessage getMessage(long longPollTime) throws InterruptedException {
+		QueueMessage message = this.getQueueMessage(longPollTime);
+		if(message != null) {
+			this.queueSize.decrementAndGet();
+		}
+		
+		return message;
+	}
+	
+	/**
+	 * 
+	 * @param longPollTime
+	 * @return
+	 * @throws InterruptedException
+	 */
+	protected abstract QueueMessage getQueueMessage(long longPollTime) throws InterruptedException;
 	
 	/**
 	 * @see com.sangupta.lineup.queues.LineUpQueue#getMessages(int)
@@ -232,6 +279,15 @@ public abstract class AbstractLineUpQueue implements LineUpQueue {
 		
 		return list;
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	@Override
+	public final int numMessages() {
+		return this.queueSize.get();
+	}
 
 	/**
 	 * 
@@ -244,7 +300,12 @@ public abstract class AbstractLineUpQueue implements LineUpQueue {
 			return false;
 		}
 		
-		return this.removeMessageID(id);
+		boolean deleted = this.removeMessageID(id);
+		if(deleted) {
+			this.queueSize.decrementAndGet();
+		}
+		
+		return deleted;
 	}
 	
 	/**

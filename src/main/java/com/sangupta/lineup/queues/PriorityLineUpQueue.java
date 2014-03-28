@@ -63,7 +63,7 @@ public class PriorityLineUpQueue extends AbstractLineUpQueue {
 	 * @see com.sangupta.lineup.queues.LineUpQueue#addMessage(com.sangupta.lineup.domain.QueueMessage)
 	 */
 	@Override
-	public QueueMessage addMessage(QueueMessage queueMessage) {
+	public QueueMessage addQueueMessage(QueueMessage queueMessage) {
 		QueueMessage older = this.currentMessages.putIfAbsent(queueMessage.getBody(), queueMessage);
 		if(older == null) {
 			// successfully added
@@ -83,7 +83,7 @@ public class PriorityLineUpQueue extends AbstractLineUpQueue {
 	 * @see com.sangupta.lineup.queues.LineUpQueue#getMessage(long)
 	 */
 	@Override
-	public QueueMessage getMessage(long longPollTime) throws InterruptedException {
+	public QueueMessage getQueueMessage(long longPollTime) throws InterruptedException {
 		QueueMessage qm = this.internalQueue.poll(longPollTime, TimeUnit.SECONDS);
 		if(qm == null) {
 			return null;
@@ -91,14 +91,6 @@ public class PriorityLineUpQueue extends AbstractLineUpQueue {
 		
 		this.currentMessages.remove(qm.getBody());
 		return qm;
-	}
-
-	/**
-	 * @see com.sangupta.lineup.queues.LineUpQueue#numMessages()
-	 */
-	@Override
-	public int numMessages() {
-		return this.currentMessages.size();
 	}
 
 	/**

@@ -21,8 +21,8 @@
 
 package com.sangupta.lineup;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import junit.framework.Assert;
@@ -32,6 +32,8 @@ import org.junit.Test;
 import com.sangupta.lineup.domain.QueueMessage;
 import com.sangupta.lineup.domain.QueueType;
 import com.sangupta.lineup.exceptions.QueueAlreadyExistsException;
+import com.sangupta.lineup.queues.DuplicateAcceptingLineUpQueue;
+import com.sangupta.lineup.queues.DuplicateRejectingLineUpQueue;
 import com.sangupta.lineup.queues.LineUpQueue;
 
 /**
@@ -54,7 +56,8 @@ public class TestAllQueues {
 			Assert.assertTrue("Queue creation failed", false);
 		}
 		
-		testQueue(queue, false);
+		Assert.assertTrue(queue instanceof DuplicateAcceptingLineUpQueue);
+		testQueue(queue, true, 2);
 	}
 	
 	@Test
@@ -66,8 +69,9 @@ public class TestAllQueues {
 		} catch (QueueAlreadyExistsException e) {
 			Assert.assertTrue("Queue creation failed", false);
 		}
-		
-		testQueue(queue, true);
+
+		Assert.assertTrue(queue instanceof DuplicateRejectingLineUpQueue);
+		testQueue(queue, true, 1);
 	}
 	
 //	@Test
@@ -83,11 +87,11 @@ public class TestAllQueues {
 //		testQueue(queue);
 //	}
 	
-	private void testQueue(LineUpQueue queue, boolean testDuplicates) {
+	private void testQueue(LineUpQueue queue, boolean testDuplicates, int duplicateSizeFactor) {
 		Assert.assertNotNull("Queue cannot be null", queue);
 		
 		// build a list of a million messages
-		List<String> messages = new ArrayList<String>();
+		Set<String> messages = new HashSet<String>();
 		for(int index = 0; index < MAX; index++) {
 			String msg = UUID.randomUUID().toString();
 			messages.add(msg);
@@ -99,13 +103,14 @@ public class TestAllQueues {
 		}
 		
 		// check size
-		Assert.assertEquals("Queue size does not match", MAX, queue.numMessages());
+		final int size = queue.numMessages();
+		Assert.assertEquals("Queue size does not match", duplicateSizeFactor * MAX, size);
 		Assert.assertEquals("Queue is empty", false, queue.isEmpty());
 		
 		// check that messages are retrieved in the same order
-		for(int index = 0; index < MAX; index++) {
+		for(int index = 0; index < size; index++) {
 			QueueMessage qm = queue.getMessage();
-			boolean same = messages.get(index).equals(qm.getBody());
+			boolean same = messages.contains(qm.getBody());
 			Assert.assertTrue("Different message received", same);
 		}
 		

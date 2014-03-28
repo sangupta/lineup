@@ -55,11 +55,6 @@ public class RemoteLineUpQueue extends AbstractLineUpQueue {
 	 */
 	private final String remoteQueue;
 	
-	/**
-	 * The default poll time to use for this queue
-	 */
-	private final long messagePollTime;
-	
 	// Various constructors follow
 	
 	/**
@@ -75,7 +70,6 @@ public class RemoteLineUpQueue extends AbstractLineUpQueue {
 		}
 		
 		this.remoteQueue = queueURL;
-		this.messagePollTime = DEFAULT_POLL_TIME;
 	}
 	
 	/**
@@ -120,7 +114,6 @@ public class RemoteLineUpQueue extends AbstractLineUpQueue {
 		}
 		
 		this.remoteQueue = UriUtils.addWebPaths(lineUpServer, "messages/" + queue.getSecurityCode() + "/" + queueName);
-		this.messagePollTime = DEFAULT_POLL_TIME;
 	}
 	
 	/**
@@ -137,7 +130,6 @@ public class RemoteLineUpQueue extends AbstractLineUpQueue {
 	
 	public RemoteLineUpQueue(String lineUpServer, String queueName, String securityCode, long defaultPollTime) {
 		this.remoteQueue = UriUtils.addWebPaths(lineUpServer, "messages/" + securityCode + "/" + queueName);
-		this.messagePollTime = defaultPollTime;
 	}
 	
 	/**
@@ -183,7 +175,7 @@ public class RemoteLineUpQueue extends AbstractLineUpQueue {
 	 * @see com.sangupta.lineup.domain.LineUpQueue#addMessage(com.sangupta.lineup.domain.QueueMessage)
 	 */
 	@Override
-	public QueueMessage addMessage(QueueMessage queueMessage) {
+	public QueueMessage addQueueMessage(QueueMessage queueMessage) {
 		WebResponse response = WebInvoker.postXML(this.remoteQueue, queueMessage);
 		if(response == null) {
 			return null;
@@ -193,18 +185,10 @@ public class RemoteLineUpQueue extends AbstractLineUpQueue {
 	}
 
 	/**
-	 * @see com.sangupta.lineup.domain.LineUpQueue#getMessage()
-	 */
-	@Override
-	public QueueMessage getMessage() {
-		return getMessage(this.messagePollTime);
-	}
-
-	/**
 	 * @see com.sangupta.lineup.domain.LineUpQueue#getMessage(int)
 	 */
 	@Override
-	public QueueMessage getMessage(long longPollTime) {
+	public QueueMessage getQueueMessage(long longPollTime) {
 		WebResponse response = WebInvoker.getResponse(this.remoteQueue + "?pollTime=" + longPollTime);
 		if(response == null) {
 			return null;
@@ -251,14 +235,6 @@ public class RemoteLineUpQueue extends AbstractLineUpQueue {
 		}
 		
 		return false;
-	}
-
-	/**
-	 * @see com.sangupta.lineup.domain.LineUpQueue#numMessages()
-	 */
-	@Override
-	public int numMessages() {
-		throw new RuntimeException("Not yet implemented");
 	}
 
 	/**
