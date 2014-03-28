@@ -27,6 +27,7 @@ import com.sangupta.lineup.queues.DuplicateAcceptingLineUpQueue;
 import com.sangupta.lineup.queues.DuplicateRejectingLineUpQueue;
 import com.sangupta.lineup.queues.LineUpQueue;
 import com.sangupta.lineup.queues.PriorityLineUpQueue;
+import com.sangupta.lineup.queues.PriorityNoDuplicateLineUpQueue;
 
 /**
  * Factory class to generate new queues depending on the options.
@@ -59,9 +60,17 @@ public class QueueGenerationFactory {
 			case RejectDuplicates:
 				return new DuplicateRejectingLineUpQueue(name, securityCode, options);
 
-			case PriorityQueue:
+			case PriorityQueueWithDuplicates:
 				return new PriorityLineUpQueue(name, securityCode, options);
 				
+			case PriorityQueueWithoutDuplicates:
+				return new PriorityNoDuplicateLineUpQueue(name, securityCode, options);
+
+			case PriorityQueueMergingDuplicates:
+				return new PriorityLineUpQueue(name, securityCode, options);
+
+			default:
+				break;
 		}
 		
 		throw new IllegalArgumentException("Queue type is neither null/nor recognized by the system");

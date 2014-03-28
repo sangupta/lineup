@@ -90,7 +90,6 @@ public class TestQueueMessage {
 	@Test
 	public void testMillionMessages() {
 		ConcurrentSkipListSet<QueueMessage> messages = new ConcurrentSkipListSet<QueueMessage>();
-//		Set<QueueMessage> messages = new HashSet<QueueMessage>();
 		QueueMessage qm = new QueueMessage("text", 0, 1);
 		messages.add(qm);
 		for(int index = 0; index < 2 * MILLION; index++) {
@@ -101,15 +100,4 @@ public class TestQueueMessage {
 		}
 	}
 	
-	@Test
-	public void testStrings() {
-		ConcurrentSkipListSet<String> messages = new ConcurrentSkipListSet<String>();
-		messages.add("text");
-		for(int index = 0; index < 2 * MILLION; index++) {
-			if(!messages.contains("text")) {
-				Assert.assertTrue("failed for index: " + index, false);
-			}
-		}
-	}
-
 }

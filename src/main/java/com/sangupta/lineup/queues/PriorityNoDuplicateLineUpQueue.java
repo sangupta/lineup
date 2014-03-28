@@ -22,6 +22,7 @@
 package com.sangupta.lineup.queues;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -36,7 +37,7 @@ import com.sangupta.lineup.domain.QueueOptions;
  * @author sangupta
  *
  */
-public class PriorityLineUpQueue extends AbstractLineUpQueue {
+public class PriorityNoDuplicateLineUpQueue extends AbstractLineUpQueue {
 	
 	/**
 	 * The internal backing queue
@@ -44,14 +45,20 @@ public class PriorityLineUpQueue extends AbstractLineUpQueue {
 	protected final BlockingQueue<QueueMessage> internalQueue;
 	
 	/**
+	 * The messages currently in the queue
+	 */
+	protected final ConcurrentSkipListSet<String> currentMessages;
+	
+	/**
 	 * @param name
 	 * @param securityCode
 	 * @param options
 	 */
-	public PriorityLineUpQueue(String name, String securityCode, QueueOptions options) {
+	public PriorityNoDuplicateLineUpQueue(String name, String securityCode, QueueOptions options) {
 		super(name, securityCode, options);
 		
 		this.internalQueue = new PriorityBlockingQueue<QueueMessage>();
+		this.currentMessages = new ConcurrentSkipListSet<String>();
 	}
 
 	/**
@@ -59,12 +66,13 @@ public class PriorityLineUpQueue extends AbstractLineUpQueue {
 	 */
 	@Override
 	public QueueMessage addQueueMessage(QueueMessage queueMessage) {
-		boolean added = this.internalQueue.add(queueMessage);
-		if(!added) {
-			return null;
+		boolean added = this.currentMessages.add(queueMessage.getBody());
+		if(added) {
+			this.internalQueue.add(queueMessage);
+			return queueMessage;
 		}
 		
-		return queueMessage;
+		return null;
 	}
 
 	/**
@@ -86,6 +94,7 @@ public class PriorityLineUpQueue extends AbstractLineUpQueue {
 	@Override
 	public void clear() {
 		this.internalQueue.clear();
+		this.currentMessages.clear();
 	}
 
 	/**

@@ -43,7 +43,7 @@ public class TestPriorityQueueWebservices {
 			lineUpServer.startServer();
 			
 			// create a new remote queue
-			LineUpQueue queue = LineUp.createRemoteQueue(server, queueName, QueueType.PriorityQueue);
+			LineUpQueue queue = LineUp.createRemoteQueue(server, queueName, QueueType.PriorityQueueMergingDuplicates);
 			
 			// add 3 messages
 			queue.addMessage("one");

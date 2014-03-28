@@ -35,7 +35,7 @@ import com.sangupta.lineup.queues.PriorityLineUpQueue;
 public class TestDuplicateMergingPriorityQueue {
 	
 	public static void main(String[] args) throws QueueAlreadyExistsException {
-		PriorityLineUpQueue pq = (PriorityLineUpQueue) LineUp.createMessageQueue("test", QueueType.PriorityQueue);
+		PriorityLineUpQueue pq = (PriorityLineUpQueue) LineUp.createMessageQueue("test", QueueType.PriorityQueueMergingDuplicates);
 		QueueMessage qm = null;
 		
 		// add more

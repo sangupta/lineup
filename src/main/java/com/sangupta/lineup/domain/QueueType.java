@@ -42,6 +42,19 @@ public enum QueueType {
 	 * be added to the queue.
 	 */
 	RejectDuplicates,
+	
+	/**
+	 * A queue that works as a priority queue and allows duplicates elements
+	 * to be inserted.
+	 */
+	PriorityQueueWithDuplicates,
+	
+	/**
+	 * A queue that works as a priority queue but does not allow duplicates. A
+	 * duplicate element if received will be ignored and not added to the queue.
+	 * 
+	 */
+	PriorityQueueWithoutDuplicates,
 
 	/**
 	 * A queue that on receiving a duplicate message, increments the priority of
@@ -49,7 +62,7 @@ public enum QueueType {
 	 * making sure that such a message is sent to clients for consumption
 	 * earlier than others in the queue.
 	 */
-	PriorityQueue;
+	PriorityQueueMergingDuplicates;
 
 	/**
 	 * A method to convert 
@@ -70,7 +83,7 @@ public enum QueueType {
 		}
 		
 		if("PriorityQueue".equalsIgnoreCase(queueType)) {
-			return PriorityQueue;
+			return PriorityQueueMergingDuplicates;
 		}
 		
 		throw new IllegalArgumentException("Unknown queue type specified as: " + queueType);

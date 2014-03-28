@@ -74,18 +74,31 @@ public class TestAllQueues {
 		testQueue(queue, true, 1);
 	}
 	
-//	@Test
-//	public void testPriorityQueue() {
-//		LineUpQueue queue = null;
-//		
-//		try {
-//			queue = LineUp.createMessageQueue("test-priority", QueueType.PriorityQueue);
-//		} catch (QueueAlreadyExistsException e) {
-//			Assert.assertTrue("Queue creation failed", false);
-//		}
-//		
-//		testQueue(queue);
-//	}
+	@Test
+	public void testPriorityQueue() {
+		LineUpQueue queue = null;
+		
+		try {
+			queue = LineUp.createMessageQueue("test-priority", QueueType.PriorityQueueWithDuplicates);
+		} catch (QueueAlreadyExistsException e) {
+			Assert.assertTrue("Queue creation failed", false);
+		}
+		
+		testQueue(queue, true, 2);
+	}
+	
+	@Test
+	public void testPriorityNoDuplicateQueue() {
+		LineUpQueue queue = null;
+		
+		try {
+			queue = LineUp.createMessageQueue("test-priority-no-dup", QueueType.PriorityQueueWithoutDuplicates);
+		} catch (QueueAlreadyExistsException e) {
+			Assert.assertTrue("Queue creation failed", false);
+		}
+		
+		testQueue(queue, true, 1);
+	}
 	
 	private void testQueue(LineUpQueue queue, boolean testDuplicates, int duplicateSizeFactor) {
 		Assert.assertNotNull("Queue cannot be null", queue);
