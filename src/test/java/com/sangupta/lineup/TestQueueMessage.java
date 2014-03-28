@@ -72,10 +72,10 @@ public class TestQueueMessage {
 		Assert.assertNotNull(qm11.getMd5());
 		
 		// compare to
-		Assert.assertTrue(qm1.compareTo(qm1) == 0);
-		Assert.assertTrue(qm1.compareTo(qm2) == 0);
-		Assert.assertTrue(qm1.compareTo(qm11) == 0);
-		Assert.assertTrue(qm1.compareTo(qm12) == 0);
+		Assert.assertTrue(qm1.compareTo(qm1) == 0); // message is same
+		Assert.assertTrue(qm1.compareTo(qm2) < 0); // messages are different, text is different
+		Assert.assertTrue(qm1.compareTo(qm11) == 0); // messages are same 
+		Assert.assertTrue(qm1.compareTo(qm12) == 0); // messages are same
 		
 		// hash code
 		Assert.assertTrue(qm1.hashCode() != qm2.hashCode());

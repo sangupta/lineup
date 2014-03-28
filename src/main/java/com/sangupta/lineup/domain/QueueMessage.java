@@ -191,7 +191,11 @@ public class QueueMessage implements Comparable<QueueMessage> {
 		int hisPriority = queueMessage.priority.get();
 		
 		if(myPriority == hisPriority) {
-			return 0;
+			if(this.body.equals(queueMessage.body)) {
+				return 0;
+			}
+			
+			return (int) (this.messageID - queueMessage.messageID);
 		}
 		
 		return 0 - (myPriority - hisPriority);
