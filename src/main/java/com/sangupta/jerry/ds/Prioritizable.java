@@ -28,5 +28,7 @@ package com.sangupta.jerry.ds;
 public interface Prioritizable {
 	
 	public int getPriority();
+	
+	public int incrementPriority(int additive);
 
 }

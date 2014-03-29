@@ -42,6 +42,8 @@ public class QueueOptions {
 	
 	public static final int DEFAULT_VISIBILITY_TIMEOUT = 30;
 	
+	public static final int DEFAULT_MAX_MERGED_PRIORITY = 50;
+	
 	private final int delaySeconds;
 	
 	private final int maximumMessageSize;
@@ -52,6 +54,8 @@ public class QueueOptions {
 	
 	private final int visibilityTimeout;
 	
+	private final int maxMergedPriority;
+	
 	private final QueueType queueType;
 	
 	/**
@@ -59,7 +63,7 @@ public class QueueOptions {
 	 * 
 	 */
 	public QueueOptions() {
-		this(DEFAULT_DELAY_SECONDS, DEFAULT_MAX_MESSAGE_SIZE, DEFALT_MESSAGE_RETENTION_PERIOD, DEFAULT_RECEIVE_MESSAGE_WAIT_TIMEOUT, DEFAULT_VISIBILITY_TIMEOUT, QueueType.AllowDuplicates);
+		this(DEFAULT_DELAY_SECONDS, DEFAULT_MAX_MESSAGE_SIZE, DEFALT_MESSAGE_RETENTION_PERIOD, DEFAULT_RECEIVE_MESSAGE_WAIT_TIMEOUT, DEFAULT_VISIBILITY_TIMEOUT, DEFAULT_MAX_MERGED_PRIORITY, QueueType.AllowDuplicates);
 	}
 	
 	/**
@@ -71,12 +75,13 @@ public class QueueOptions {
 	 * @param receiveMessageWaitTimeSeconds
 	 * @param visibilityTimeout
 	 */
-	public QueueOptions(int delaySeconds, int maximumMessageSize, int messageRetentionPeriod, int receiveMessageWaitTimeSeconds, int visibilityTimeout, QueueType queueType) {
+	public QueueOptions(int delaySeconds, int maximumMessageSize, int messageRetentionPeriod, int receiveMessageWaitTimeSeconds, int visibilityTimeout, int maxMergedPriority, QueueType queueType) {
 		this.delaySeconds = delaySeconds;
 		this.maximumMessageSize = maximumMessageSize;
 		this.messageRetentionPeriod = messageRetentionPeriod;
 		this.receiveMessageWaitTimeSeconds = receiveMessageWaitTimeSeconds;
 		this.visibilityTimeout = visibilityTimeout;
+		this.maxMergedPriority = maxMergedPriority;
 		this.queueType = queueType;
 	}
 	
@@ -98,7 +103,7 @@ public class QueueOptions {
 	 * @return
 	 */
 	public static QueueOptions getOptions(QueueType queueType) {
-		return new QueueOptions(DEFAULT_DELAY_SECONDS, DEFAULT_MAX_MESSAGE_SIZE, DEFALT_MESSAGE_RETENTION_PERIOD, DEFAULT_RECEIVE_MESSAGE_WAIT_TIMEOUT, DEFAULT_VISIBILITY_TIMEOUT, queueType);
+		return new QueueOptions(DEFAULT_DELAY_SECONDS, DEFAULT_MAX_MESSAGE_SIZE, DEFALT_MESSAGE_RETENTION_PERIOD, DEFAULT_RECEIVE_MESSAGE_WAIT_TIMEOUT, DEFAULT_VISIBILITY_TIMEOUT, DEFAULT_MAX_MERGED_PRIORITY, queueType);
 	}
 	
 	// Usual accessors follow
@@ -143,6 +148,13 @@ public class QueueOptions {
 	 */
 	public QueueType getQueueType() {
 		return queueType;
+	}
+
+	/**
+	 * @return the maxMergedPriority
+	 */
+	public int getMaxMergedPriority() {
+		return maxMergedPriority;
 	}
 
 }

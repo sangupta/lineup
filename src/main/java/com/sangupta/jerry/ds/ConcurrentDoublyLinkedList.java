@@ -37,6 +37,7 @@ import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
@@ -73,46 +74,49 @@ import java.util.concurrent.atomic.AtomicReference;
  * 
  * <h3>Implementation Notes</h3>
  * 
- * This is an adaptation of an algorithm described in Paul Martin's "A
- * Practical Lock-Free Doubly-Linked List". Sun Labs Tech report. The basic
- * idea is to primarily rely on next-pointers to ensure consistency.
- * Prev-pointers are in part optimistic, reconstructed using forward
- * pointers as needed. The main forward list uses a variant of HM-list
- * algorithm similar to the one used in ConcurrentSkipListMap class, but a
- * little simpler. It is also basically similar to the approach in Edya
- * Ladan-Mozes and Nir Shavit "An Optimistic Approach to Lock-Free FIFO
- * Queues" in DISC04.
+ * This is an adaptation of an algorithm described in Paul Martin's "A Practical
+ * Lock-Free Doubly-Linked List". Sun Labs Tech report. The basic idea is to
+ * primarily rely on next-pointers to ensure consistency. Prev-pointers are in
+ * part optimistic, reconstructed using forward pointers as needed. The main
+ * forward list uses a variant of HM-list algorithm similar to the one used in
+ * ConcurrentSkipListMap class, but a little simpler. It is also basically
+ * similar to the approach in Edya Ladan-Mozes and Nir Shavit "An Optimistic
+ * Approach to Lock-Free FIFO Queues" in DISC04.
  * 
  * Quoting a summary in Paul Martin's tech report:
  * 
- * All cleanups work to maintain these invariants: (1) forward pointers are
- * the ground truth. (2) forward pointers to dead nodes can be improved by
- * swinging them further forward around the dead node. (2.1) forward
- * pointers are still correct when pointing to dead nodes, and forward
- * pointers from dead nodes are left as they were when the node was deleted.
- * (2.2) multiple dead nodes may point forward to the same node. (3)
- * backward pointers were correct when they were installed (3.1) backward
- * pointers are correct when pointing to any node which points forward to
- * them, but since more than one forward pointer may point to them, the live
- * one is best. (4) backward pointers that are out of date due to deletion
- * point to a deleted node, and need to point further back until they point
- * to the live node that points to their source. (5) backward pointers that
- * are out of date due to insertion point too far backwards, so shortening
- * their scope (by searching forward) fixes them. (6) backward pointers from
- * a dead node cannot be "improved" since there may be no live node pointing
- * forward to their origin. (However, it does no harm to try to improve them
- * while racing with a deletion.)
+ * All cleanups work to maintain these invariants: (1) forward pointers are the
+ * ground truth. (2) forward pointers to dead nodes can be improved by swinging
+ * them further forward around the dead node. (2.1) forward pointers are still
+ * correct when pointing to dead nodes, and forward pointers from dead nodes are
+ * left as they were when the node was deleted. (2.2) multiple dead nodes may
+ * point forward to the same node. (3) backward pointers were correct when they
+ * were installed (3.1) backward pointers are correct when pointing to any node
+ * which points forward to them, but since more than one forward pointer may
+ * point to them, the live one is best. (4) backward pointers that are out of
+ * date due to deletion point to a deleted node, and need to point further back
+ * until they point to the live node that points to their source. (5) backward
+ * pointers that are out of date due to insertion point too far backwards, so
+ * shortening their scope (by searching forward) fixes them. (6) backward
+ * pointers from a dead node cannot be "improved" since there may be no live
+ * node pointing forward to their origin. (However, it does no harm to try to
+ * improve them while racing with a deletion.)
  * 
  * Notation guide for local variables n, b, f : a node, its predecessor, and
  * successor s : some other successor
  * 
  * <h3>Modifications</h3>
  * 
- * The implementation has been modified for the following reasons. 
+ * The implementation has been modified for the following reasons.
  * 
- * One that we return back the
- * {@link Node} object itself when an item is added, so that it can be used to
- * delete the items directly without worry about finding them in the linked list.
+ * One that we return back the {@link Node} object itself when an item is added,
+ * so that it can be used to delete the items directly without worry about
+ * finding them in the linked list.
+ * 
+ * Second, that the nodes can be directly removed from outside of the list. And thus
+ * each {@link Node} contains a boolean flag deleted, that specifies if the element
+ * is being deleted. This makes sure that no two threads can remove the element
+ * at the same time.
  * 
  * 
  * @author Doug Lea
@@ -120,7 +124,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * 
  * @param <E>
  *            the type of elements held in this collection
- *            
+ * 
  */
 public class ConcurrentDoublyLinkedList<E> extends AbstractCollection<E> implements java.io.Serializable {
 
@@ -244,6 +248,22 @@ public class ConcurrentDoublyLinkedList<E> extends AbstractCollection<E> impleme
 		while (trailer.prepend(o) == null)
 			;
 	}
+	
+	/**
+	 * Appends the given element to the end of this deque. This is identical in
+	 * function to the <tt>add</tt> method.
+	 * 
+	 * @param o
+	 *            the element to be inserted at the end of this deque.
+	 * @throws NullPointerException
+	 *             if the specified element is <tt>null</tt>
+	 */
+	public void addLast(Node<E> node) {
+		checkNullArg(node);
+		
+		while (trailer.prepend(node) == null)
+			;
+	}
 
 	/**
 	 * Prepends the given element at the beginning of this deque.
@@ -270,6 +290,21 @@ public class ConcurrentDoublyLinkedList<E> extends AbstractCollection<E> impleme
 	 *             if the specified element is <tt>null</tt>
 	 */
 	public boolean offerLast(E o) {
+		addLast(o);
+		return true;
+	}
+	
+	/**
+	 * Appends the given element to the end of this deque. (Identical in
+	 * function to the <tt>add</tt> method; included only for consistency.)
+	 * 
+	 * @param o
+	 *            the element to be inserted at the end of this deque.
+	 * @return <tt>true</tt> always
+	 * @throws NullPointerException
+	 *             if the specified element is <tt>null</tt>
+	 */
+	public boolean offerLast(Node<E> o) {
 		addLast(o);
 		return true;
 	}
@@ -379,6 +414,10 @@ public class ConcurrentDoublyLinkedList<E> extends AbstractCollection<E> impleme
 
 	public boolean add(E e) {
 		return offerLast(e);
+	}
+	
+	public boolean add(Node<E> node) {
+		return offerLast(node);
 	}
 
 	public E poll() {
@@ -675,7 +714,7 @@ class Node<E> extends AtomicReference<Node<E>> {
 	private volatile Node<E> prev;
 
 	final E element;
-
+	
 	/** Creates a node with given contents */
 	Node(E element, Node<E> next, Node<E> prev) {
 		super(next);
@@ -689,7 +728,7 @@ class Node<E> extends AtomicReference<Node<E>> {
 		this.prev = this;
 		this.element = null;
 	}
-
+	
 	/**
 	 * Gets next link (which is actually the value held as atomic reference).
 	 */
@@ -912,7 +951,32 @@ class Node<E> extends AtomicReference<Node<E>> {
 			}
 		}
 	}
-
+	
+	/**
+	 * Tries to insert a node holding element as predecessor, failing if no live
+	 * predecessor can be found to link to.
+	 * 
+	 * @param element
+	 *            the element
+	 * @return the new node, or null on failure.
+	 */
+	Node<E> prepend(Node<E> x) {
+		for (;;) {
+			Node<E> b = predecessor();
+			if (b == null)
+				return null;
+//			Node<E> x = new Node<E>(element, this, b);
+			
+			x.setNext(this);
+			x.setPrev(b);
+			
+			if (b.casNext(this, x)) {
+				setPrev(x); // optimistically link
+				return x;
+			}
+		}
+	}
+	
 	/**
 	 * Tries to mark this node as deleted, failing if already deleted or if this
 	 * node is header or trailer

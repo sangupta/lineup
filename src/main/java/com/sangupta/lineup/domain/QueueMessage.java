@@ -172,7 +172,9 @@ public class QueueMessage implements Comparable<QueueMessage>, Prioritizable {
 	 */
 	@Override
 	public int hashCode() {
-		return this.body.hashCode();
+		// TODO: revisit this to see if we need to compute
+		// hashCode() based on 
+		return ((Long) messageID).hashCode();
 	}
 	
 	/**
