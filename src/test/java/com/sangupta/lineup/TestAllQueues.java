@@ -46,6 +46,10 @@ public class TestAllQueues {
 	
 	private static final int MAX = 1000 * 1000;
 	
+	/**
+	 * Test the default queue called {@link QueueType#AllowDuplicates}.
+	 * 
+	 */
 	@Test
 	public void testDuplicateAcceptingQueue() {
 		LineUpQueue queue = null;
@@ -60,6 +64,10 @@ public class TestAllQueues {
 		testQueue(queue, true, 2);
 	}
 	
+	/**
+	 * Test the default queue called {@link QueueType#RejectDuplicates}.
+	 * 
+	 */
 	@Test
 	public void testDuplicateRejectingQueue() {
 		LineUpQueue queue = null;
@@ -74,6 +82,10 @@ public class TestAllQueues {
 		testQueue(queue, true, 1);
 	}
 	
+	/**
+	 * Test the default queue called {@link QueueType#PriorityQueueWithDuplicates}.
+	 * 
+	 */
 	@Test
 	public void testPriorityQueue() {
 		LineUpQueue queue = null;
@@ -87,6 +99,10 @@ public class TestAllQueues {
 		testQueue(queue, true, 2);
 	}
 	
+	/**
+	 * Test the default queue called {@link QueueType#PriorityQueueWithoutDuplicates}.
+	 * 
+	 */
 	@Test
 	public void testPriorityNoDuplicateQueue() {
 		LineUpQueue queue = null;
@@ -100,6 +116,23 @@ public class TestAllQueues {
 		testQueue(queue, true, 1);
 	}
 	
+	/**
+	 * Test the default queue called {@link QueueType#PriorityQueueMergingDuplicates}.
+	 * 
+	 */
+	@Test
+	public void testPriorityMergingQueue() {
+		LineUpQueue queue = null;
+		
+		try {
+			queue = LineUp.createMessageQueue("test-priority-merge", QueueType.PriorityQueueMergingDuplicates);
+		} catch (QueueAlreadyExistsException e) {
+			Assert.assertTrue("Queue creation failed", false);
+		}
+		
+		testQueue(queue, true, 1);
+	}
+
 	private void testQueue(LineUpQueue queue, boolean testDuplicates, int duplicateSizeFactor) {
 		Assert.assertNotNull("Queue cannot be null", queue);
 		

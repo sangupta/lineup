@@ -25,16 +25,33 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
  * A priority queue implementation that allows us to change the priority
  * of each item.
  * 
+ * The clear() method if invoked from any thread will lock all threads that
+ * try and perform add() or poll() calls after the clear() method was called.
+ * 
+ * If no clear() invocation has been made, no locks are obtained and the entire
+ * queue functionality is mostly lock-free. This ensures that the usual operations
+ * are faster.
+ * 
+ * The add() method is usually <code>O(1)</code>. The poll() method is usually
+ * <code>O(1)</code>, with worst case complexity of <code>O(m)</code> where <code>m</code>
+ * is the maximum priority that has been set for this queue.
+ * 
+ * The clear() method is always <code>O(m)</code>, where <code>m</code>
+ * is the maximum priority that has been set for this queue.
+ * 
  * @author sangupta
  *
  */
 public class ChangingPriorityQueue<E extends Prioritizable> {
+	
+	protected final Node<E> SENTINEL_NODE = new Node(null);
 
 	/**
 	 * The maximum priority that an element can achieve. Once this value is
@@ -60,6 +77,19 @@ public class ChangingPriorityQueue<E extends Prioritizable> {
 	protected final ConcurrentMap<E, Node<E>> currentItems;
 	
 	/**
+	 * A guard that helps threads wait before adding something if clearing
+	 * of all elements is in progress.
+	 */
+	protected volatile boolean clearing = false;
+	
+	/**
+	 * Helps lock all methods when something like clearing
+	 * takes place.
+	 * 
+	 */
+	protected final ReentrantLock reentrantLock;
+	
+	/**
 	 * Create a new queue where the maximum priority of an element is specified.
 	 * 
 	 * @param maxPriority
@@ -75,6 +105,7 @@ public class ChangingPriorityQueue<E extends Prioritizable> {
 		
 		this.currentItems = new ConcurrentHashMap<E, Node<E>>();
 		this.currentQueue = new AtomicInteger(0);
+		this.reentrantLock = new ReentrantLock();
 	}
 
 	/**
@@ -93,29 +124,53 @@ public class ChangingPriorityQueue<E extends Prioritizable> {
 			throw new IllegalArgumentException("Priority of the element cannot be negative");
 		}
 		
-		Node<E> older = this.currentItems.putIfAbsent(element, null);
-		if(older != null) {
-			return incrementPriority(older, element.getPriority());
+		// check for clear() call
+		boolean locked = false;
+		if(this.clearing) {
+			this.reentrantLock.lock();
+			locked = true;
 		}
 		
-		if(priority > this.maxPriority) {
-			priority = this.maxPriority - 1;
+		// proceed for adding
+		try {
+			Node<E> older = this.currentItems.putIfAbsent(element, SENTINEL_NODE);
+			if(older != null) {
+				while(older == SENTINEL_NODE) { // this is a memory location comparison for SENTINAL NODE check
+					older = this.currentItems.get(element);
+				}
+				
+				return incrementPriority(older, element.getPriority());
+			}
+			
+			if(priority > this.maxPriority) {
+				priority = this.maxPriority - 1;
+			}
+			
+			// add element to right list
+			Node<E> node = this.lists[priority].offerLast(element);
+			
+			if(node != null) {
+				this.currentItems.replace(element, SENTINEL_NODE, node);
+				updateCurrentQueue(priority);
+			}
+			
+			return node != null;
+		} finally {
+			// clear any previous lock
+			if(locked) {
+				this.reentrantLock.unlock();
+			}
 		}
-		
-		// add element to right list
-		boolean added = this.lists[priority].add(element);
-		
-		if(added) {
-			updateCurrentQueue(priority);
-		}
-		
-		return added;
 	}
 	
 	/**
 	 * Increment the priority of the element in the node by the amount that is specified.
 	 * Take care of min and max priority. Also, we need to then place the element in the
 	 * right queue.
+	 * 
+	 * There is no need for obtaining the lock here when clear() is in progress as this
+	 * method is called from within the add() method which should have obtained the lock
+	 * at the right time.
 	 * 
 	 * @param node
 	 * @param deltaPriority
@@ -156,6 +211,9 @@ public class ChangingPriorityQueue<E extends Prioritizable> {
 			
 			// move this to the new list
 			this.lists[newPriority].add(node);
+			
+			// update the current queue
+			this.updateCurrentQueue(newPriority);
 		}
 		
 		return false;
@@ -167,6 +225,28 @@ public class ChangingPriorityQueue<E extends Prioritizable> {
 	 * @return
 	 */
 	public E poll() {
+		// check for clear() call
+		boolean locked = false;
+		if(this.clearing) {
+			this.reentrantLock.lock();
+			locked = true;
+		}
+		
+		try {
+			return pollUnlocked();
+		} finally {
+			// clear any previous lock
+			if(locked) {
+				this.reentrantLock.unlock();
+			}
+		}
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	private E pollUnlocked() {
 		do {
 			int current = this.currentQueue.get();
 			
@@ -196,6 +276,10 @@ public class ChangingPriorityQueue<E extends Prioritizable> {
 	 * @return
 	 */
 	public E poll(long timeout, TimeUnit timeUnit) {
+		if(timeout == 0) {
+			return poll();
+		}
+		
 		long nanos = timeUnit.toNanos(timeout);
 		long expireAt = System.nanoTime() + nanos;
 		E result = null;
@@ -224,11 +308,27 @@ public class ChangingPriorityQueue<E extends Prioritizable> {
 	}
 	
 	/**
-	 * Clear all lists right away.
+	 * Clear all lists right away. We need to make sure that all the items from
+	 * all existing lists can be cleared, and
 	 * 
 	 */
 	public void clear() {
-		
+		this.clearing = true;
+		try {
+			// obtain a lock so that nothing else can happen
+			this.reentrantLock.lock();
+			
+			// clear all lists
+			for(int index = 0; index < this.lists.length; index++) {
+				this.lists[index].clear();
+			}
+			
+			this.currentQueue.set(0);
+			this.currentItems.clear();
+		} finally {
+			this.clearing = false;
+			this.reentrantLock.unlock();
+		}
 	}
 	
 	/**
@@ -239,8 +339,15 @@ public class ChangingPriorityQueue<E extends Prioritizable> {
 	private void updateCurrentQueue(final int value) {
 		do {
 			int current = this.currentQueue.get();
+			if(current >= value) {
+				return;
+			}
+			
 			if(current < value) {
-				this.currentQueue.compareAndSet(current, value);
+				boolean changed = this.currentQueue.compareAndSet(current, value);
+				if(changed) {
+					return;
+				}
 			}
 		} while(true);
 	}

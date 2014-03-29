@@ -26,6 +26,7 @@ import com.sangupta.lineup.domain.QueueType;
 import com.sangupta.lineup.queues.DuplicateAcceptingLineUpQueue;
 import com.sangupta.lineup.queues.DuplicateRejectingLineUpQueue;
 import com.sangupta.lineup.queues.LineUpQueue;
+import com.sangupta.lineup.queues.MergingPriorityLineUpQueue;
 import com.sangupta.lineup.queues.PriorityLineUpQueue;
 import com.sangupta.lineup.queues.PriorityNoDuplicateLineUpQueue;
 
@@ -67,7 +68,7 @@ public class QueueGenerationFactory {
 				return new PriorityNoDuplicateLineUpQueue(name, securityCode, options);
 
 			case PriorityQueueMergingDuplicates:
-				return new PriorityLineUpQueue(name, securityCode, options);
+				return new MergingPriorityLineUpQueue(name, securityCode, options);
 
 			default:
 				break;

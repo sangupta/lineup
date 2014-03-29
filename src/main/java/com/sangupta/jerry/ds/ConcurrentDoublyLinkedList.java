@@ -243,10 +243,14 @@ public class ConcurrentDoublyLinkedList<E> extends AbstractCollection<E> impleme
 	 * @throws NullPointerException
 	 *             if the specified element is <tt>null</tt>
 	 */
-	public void addLast(E o) {
+	public Node<E> addLast(E o) {
 		checkNullArg(o);
-		while (trailer.prepend(o) == null)
+		Node<E> node;
+		
+		while ((node = trailer.prepend(o)) == null)
 			;
+		
+		return node;
 	}
 	
 	/**
@@ -289,9 +293,8 @@ public class ConcurrentDoublyLinkedList<E> extends AbstractCollection<E> impleme
 	 * @throws NullPointerException
 	 *             if the specified element is <tt>null</tt>
 	 */
-	public boolean offerLast(E o) {
-		addLast(o);
-		return true;
+	public Node<E> offerLast(E o) {
+		return addLast(o);
 	}
 	
 	/**
@@ -409,11 +412,11 @@ public class ConcurrentDoublyLinkedList<E> extends AbstractCollection<E> impleme
 
 	// *** Queue and stack methods ***
 	public boolean offer(E e) {
-		return offerLast(e);
+		return offerLast(e) != null;
 	}
 
 	public boolean add(E e) {
-		return offerLast(e);
+		return offerLast(e) != null;
 	}
 	
 	public boolean add(Node<E> node) {
