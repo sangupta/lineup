@@ -13,14 +13,23 @@ Features
 * Three different queue types
  * Default: all messages are allowed, including duplicates
  * Reject Duplicates: reject all duplicate messages
- * Priority: accept all duplicates and merge them to increase their priority
+ * Priority with Duplicates: a simple priority queue that allows duplicates to be stored
+ * Priority without Duplicates: a simple priority queue that rejects duplicates
+ * Merging Priority: accept all duplicates and merge them by increasing their priority
 * Accesible via REST API
-* Amazon SQS API compliant
+* Amazon SQS API compliant (to be done)
 
 **NOTE:** The library is currently under development and may not be stable or may not support all features.
 
 Builds
 ------
+
+**0.2.0 (Current Snapshot)**
+
+* Added two more queue types in priority queues
+* Simplified merging priority queue to make sure that insert/update operations are O(1) on average
+* Fixed a few race conditions and synchronization issues
+* Moved to using lock-free data-strucutre for merging priority queue
 
 **0.1.0**
 
