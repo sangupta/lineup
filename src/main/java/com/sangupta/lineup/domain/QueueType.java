@@ -82,6 +82,14 @@ public enum QueueType {
 			return RejectDuplicates;
 		}
 		
+		if("PriorityQueueWithDuplicates".equalsIgnoreCase(queueType)) {
+			return PriorityQueueWithDuplicates;
+		}
+		
+		if("PriorityQueueNoDuplicates".equalsIgnoreCase(queueType)) {
+			return PriorityQueueWithoutDuplicates;
+		}
+		
 		if("PriorityQueue".equalsIgnoreCase(queueType)) {
 			return PriorityQueueMergingDuplicates;
 		}

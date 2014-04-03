@@ -78,9 +78,9 @@ public class TestQueueMessage {
 		Assert.assertTrue(qm1.compareTo(qm12) == 0); // messages are same
 		
 		// hash code
-//		Assert.assertTrue(qm1.hashCode() != qm2.hashCode());
-//		Assert.assertTrue(qm1.hashCode() == qm11.hashCode());
-//		Assert.assertTrue(qm1.hashCode() == qm12.hashCode());
+		Assert.assertTrue(qm1.hashCode() != qm2.hashCode());
+		Assert.assertTrue(qm1.hashCode() == qm11.hashCode());
+		Assert.assertTrue(qm1.hashCode() == qm12.hashCode());
 		
 		ConcurrentSkipListSet<QueueMessage> set = new ConcurrentSkipListSet<QueueMessage>();
 		Assert.assertTrue(set.add(qm1));
