@@ -3,7 +3,7 @@
  * lineup - In-Memory high-throughput queue
  * Copyright (c) 2013, Sandeep Gupta
  * 
- * http://www.sangupta/projects/lineup
+ * http://sangupta.com/projects/lineup
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -198,8 +198,8 @@ public class ConcurrentDoublyLinkedList<E> extends AbstractCollection<E> impleme
 	 * Constructs an empty deque.
 	 */
 	public ConcurrentDoublyLinkedList() {
-		Node h = new Node(null, null, null);
-		Node t = new Node(null, null, h);
+		Node<E> h = new Node<E>(null, null, null);
+		Node<E> t = new Node<E>(null, null, h);
 		h.setNext(t);
 		header = h;
 		trailer = t;
@@ -989,7 +989,7 @@ class Node<E> extends AtomicReference<Node<E>> {
 	boolean delete() {
 		Node<E> b = getPrev();
 		Node<E> f = getNext();
-		if (b != null && f != null && !f.isMarker() && casNext(f, new Node(f))) {
+		if (b != null && f != null && !f.isMarker() && casNext(f, new Node<E>(f))) {
 			if (b.casNext(this, f))
 				f.setPrev(b);
 			return true;
@@ -1012,7 +1012,7 @@ class Node<E> extends AtomicReference<Node<E>> {
 			if (b == null || f == null || f.isMarker())
 				return null;
 			Node<E> x = new Node<E>(newElement, f, b);
-			if (casNext(f, new Node(x))) {
+			if (casNext(f, new Node<E>(x))) {
 				b.successor(); // to relink b
 				x.successor(); // to relink f
 				return x;

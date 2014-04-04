@@ -3,7 +3,7 @@
  * lineup - In-Memory high-throughput queue
  * Copyright (c) 2013, Sandeep Gupta
  * 
- * http://www.sangupta/projects/lineup
+ * http://sangupta.com/projects/lineup
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class ChangingPriorityQueue<E extends Prioritizable> {
 	
-	protected final Node<E> SENTINEL_NODE = new Node(null);
+	protected final Node<E> SENTINEL_NODE = new Node<E>(null);
 
 	/**
 	 * The maximum priority that an element can achieve. Once this value is
