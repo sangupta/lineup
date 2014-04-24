@@ -44,7 +44,7 @@ import com.sangupta.lineup.queues.LineUpQueue;
  */
 public class TestAllQueues {
 	
-	private static final int MAX = 1000 * 1000;
+	private static final int MAX = 10 * 1000;
 	
 	/**
 	 * Test the default queue called {@link QueueType#AllowDuplicates}.
@@ -165,6 +165,11 @@ public class TestAllQueues {
 		
 		// check isEmpty
 		Assert.assertEquals("Queue is not empty", true, queue.isEmpty());
+		
+		// clear everything
+		queue.clear();
+		messages.clear();
+		System.gc();
 	}
 
 }
