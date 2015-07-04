@@ -150,7 +150,6 @@
                     <breakiterator>true</breakiterator>
                     <version>false</version>
                     <keywords>true</keywords>
-                    <failOnError>false</failOnError>
                 </configuration>
 			</plugin>
 
