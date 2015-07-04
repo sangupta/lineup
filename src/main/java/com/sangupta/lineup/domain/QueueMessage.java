@@ -86,6 +86,8 @@ public class QueueMessage implements Comparable<QueueMessage>, Prioritizable {
 	 * @param delaySeconds
 	 *            the delay in seconds before the message is added to the queues
 	 * 
+	 * @param priority
+	 *            the priority of the message
 	 */
 	public QueueMessage(String body, int delaySeconds, int priority) {
 		if(AssertUtils.isEmpty(body)) {
@@ -109,7 +111,8 @@ public class QueueMessage implements Comparable<QueueMessage>, Prioritizable {
 	 * Increment the priority of this message by one. This method only increases
 	 * the priority within this object, moving it to the top of the queue is the
 	 * responsibility of the callee.
-	 * 
+	 *
+	 * @return the incremented and final priority just set
 	 */
 	public int incrementPriority() {
 		return this.priority.incrementAndGet();
@@ -121,7 +124,9 @@ public class QueueMessage implements Comparable<QueueMessage>, Prioritizable {
 	 * queue is the responsibility of the callee.
 	 * 
 	 * @param additive
-	 * @return
+	 *            the priority to add or subtract
+	 * 
+	 * @return the final current priority
 	 */
 	public int incrementPriority(int additive) {
 		return this.priority.addAndGet(additive);

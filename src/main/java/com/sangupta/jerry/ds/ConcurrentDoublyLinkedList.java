@@ -240,6 +240,9 @@ public class ConcurrentDoublyLinkedList<E> extends AbstractCollection<E> impleme
 	 * 
 	 * @param o
 	 *            the element to be inserted at the end of this deque.
+	 * 
+	 * @return the element added
+	 * 
 	 * @throws NullPointerException
 	 *             if the specified element is <tt>null</tt>
 	 */
@@ -257,8 +260,9 @@ public class ConcurrentDoublyLinkedList<E> extends AbstractCollection<E> impleme
 	 * Appends the given element to the end of this deque. This is identical in
 	 * function to the <tt>add</tt> method.
 	 * 
-	 * @param o
+	 * @param node
 	 *            the element to be inserted at the end of this deque.
+	 *            
 	 * @throws NullPointerException
 	 *             if the specified element is <tt>null</tt>
 	 */

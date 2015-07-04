@@ -61,6 +61,7 @@ public class RemoteLineUpQueue extends AbstractLineUpQueue {
 	 * Create a {@link LineUpQueue} that connects to the given remote queue.
 	 * 
 	 * @param queueURL
+	 *            the URL to the queue server
 	 */
 	public RemoteLineUpQueue(String queueURL) {
 		super("RemoteQueue: "+ queueURL, null, null);
@@ -73,23 +74,31 @@ public class RemoteLineUpQueue extends AbstractLineUpQueue {
 	}
 	
 	/**
-	 * Create a {@link LineUpQueue} that connects to the given remote server, and connects
-	 * to an already existing queue.
+	 * Create a {@link LineUpQueue} that connects to the given remote server,
+	 * and connects to an already existing queue.
 	 * 
 	 * @param lineUpServer
+	 *            the URL to the queue server
+	 * 
 	 * @param queueName
+	 *            the name of the queue
 	 */
 	public RemoteLineUpQueue(String lineUpServer, String queueName) {
 		this(lineUpServer, queueName, QueueOptions.getOptions(QueueType.AllowDuplicates));
 	}
 	
 	/**
-	 * Create a {@link LineUpQueue} that connects to the given remote server, and creates
-	 * a new queue with the given name and options. 
+	 * Create a {@link LineUpQueue} that connects to the given remote server,
+	 * and creates a new queue with the given name and options.
 	 * 
 	 * @param lineUpServer
+	 *            the URL to the queue server
+	 * 
 	 * @param queueName
+	 *            the name of the queue
+	 * 
 	 * @param queueOptions
+	 *            the options for the queue
 	 */
 	public RemoteLineUpQueue(String lineUpServer, String queueName, QueueOptions queueOptions) {
 		if(queueOptions == null) {
@@ -117,12 +126,18 @@ public class RemoteLineUpQueue extends AbstractLineUpQueue {
 	}
 	
 	/**
-	 * Create a {@link LineUpQueue} that connects to the given remote server, and connects
-	 * to an already existing queue with the given name and security code.
+	 * Create a {@link LineUpQueue} that connects to the given remote server,
+	 * and connects to an already existing queue with the given name and
+	 * security code.
 	 * 
 	 * @param lineUpServer
+	 *            the URL to the queue server
+	 * 
 	 * @param queueName
+	 *            the name of the queue
+	 * 
 	 * @param securityCode
+	 *            the security code
 	 */
 	public RemoteLineUpQueue(String lineUpServer, String queueName, String securityCode) {
 		this(lineUpServer, queueName, securityCode, DEFAULT_POLL_TIME);
@@ -133,7 +148,7 @@ public class RemoteLineUpQueue extends AbstractLineUpQueue {
 	}
 	
 	/**
-	 * @see com.sangupta.lineup.domain.LineUpQueue#addMessage(java.lang.String)
+	 * @see AbstractLineUpQueue#addMessage(String)
 	 */
 	@Override
 	public QueueMessage addMessage(String message) {
@@ -151,7 +166,7 @@ public class RemoteLineUpQueue extends AbstractLineUpQueue {
 	}
 	
 	/**
-	 * @see com.sangupta.lineup.domain.LineUpQueue#addMessage(java.lang.String, int)
+	 * @see LineUpQueue#addMessage(java.lang.String, int)
 	 */
 	@Override
 	public QueueMessage addMessage(String message, int delaySeconds) {
@@ -159,7 +174,7 @@ public class RemoteLineUpQueue extends AbstractLineUpQueue {
 	}
 
 	/**
-	 * @see com.sangupta.lineup.domain.LineUpQueue#addMessage(java.lang.String, int, int)
+	 * @see LineUpQueue#addMessage(java.lang.String, int, int)
 	 */
 	@Override
 	public QueueMessage addMessage(String message, int delaySeconds, int priority) {
@@ -172,7 +187,7 @@ public class RemoteLineUpQueue extends AbstractLineUpQueue {
 	}
 
 	/**
-	 * @see com.sangupta.lineup.domain.LineUpQueue#addMessage(com.sangupta.lineup.domain.QueueMessage)
+	 * @see LineUpQueue#addMessage(com.sangupta.lineup.domain.QueueMessage)
 	 */
 	@Override
 	public QueueMessage addQueueMessage(QueueMessage queueMessage) {
@@ -185,7 +200,7 @@ public class RemoteLineUpQueue extends AbstractLineUpQueue {
 	}
 
 	/**
-	 * @see com.sangupta.lineup.domain.LineUpQueue#getMessage(int)
+	 * @see AbstractLineUpQueue#getQueueMessage(long)
 	 */
 	@Override
 	public QueueMessage getQueueMessage(long longPollTime) {
@@ -206,7 +221,7 @@ public class RemoteLineUpQueue extends AbstractLineUpQueue {
 	}
 
 	/**
-	 * @see com.sangupta.lineup.domain.LineUpQueue#getMessages(int)
+	 * @see LineUpQueue#getMessages(int)
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
@@ -220,7 +235,7 @@ public class RemoteLineUpQueue extends AbstractLineUpQueue {
 	}
 
 	/**
-	 * @see com.sangupta.lineup.domain.LineUpQueue#deleteMessage(java.lang.String)
+	 * @see LineUpQueue#deleteMessage(java.lang.String)
 	 */
 	@Override
 	public boolean deleteMessage(String messageID) {

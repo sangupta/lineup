@@ -49,19 +49,23 @@ public class LineUpServer {
      * Create a new {@link LineUpServer} instance with default
      * webservices.
      * 
-     * @param serverURL
+     * @param serverURL the URL to the queue server
      */
 	public LineUpServer(String serverURL) {
 		this(serverURL, null);
 	}
 	
 	/**
-	 * Create a new {@link LineUpServer} instance also loading
-	 * custom webservices from the package provided. The webservices
-	 * must be Jersey-enabled to work properly.
+	 * Create a new {@link LineUpServer} instance also loading custom
+	 * webservices from the package provided. The webservices must be
+	 * Jersey-enabled to work properly.
 	 * 
 	 * @param serverURL
+	 *            the URL to the queue server
+	 * 
 	 * @param customJerseyWebservices
+	 *            the jersey webservices to load additionally
+	 * 
 	 */
 	public LineUpServer(final String serverURL, final String[] customJerseyWebservices) {
 		if(AssertUtils.isEmpty(customJerseyWebservices)) {

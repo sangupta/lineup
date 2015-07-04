@@ -70,10 +70,25 @@ public class QueueOptions {
 	 * Constructor that allows setting all values.
 	 * 
 	 * @param delaySeconds
+	 *            the delay in seconds
+	 * 
 	 * @param maximumMessageSize
+	 *            the max size of message
+	 * 
 	 * @param messageRetentionPeriod
+	 *            the time for which to retain the message
+	 * 
 	 * @param receiveMessageWaitTimeSeconds
+	 *            the message recieve wait time
+	 * 
 	 * @param visibilityTimeout
+	 *            the visibility timeout of message
+	 * 
+	 * @param maxMergedPriority
+	 * 			  the maximum merged priority a message can have
+	 * 
+	 * @param queueType
+	 * 			  the type of the queue
 	 */
 	public QueueOptions(int delaySeconds, int maximumMessageSize, int messageRetentionPeriod, int receiveMessageWaitTimeSeconds, int visibilityTimeout, int maxMergedPriority, QueueType queueType) {
 		this.delaySeconds = delaySeconds;
@@ -90,7 +105,7 @@ public class QueueOptions {
 	/**
 	 * Create default queue options.
 	 * 
-	 * @return
+	 * @return the {@link QueueOptions} instance set with default values
 	 */
 	public static QueueOptions getDefaultOptions() {
 		return new QueueOptions();
@@ -100,7 +115,10 @@ public class QueueOptions {
 	 * Create default queue options for the given queue type.
 	 * 
 	 * @param queueType
-	 * @return
+	 *            the type of queue to use
+	 * 
+	 * @return the default {@link QueueOptions} but for the given
+	 *         {@link QueueType}
 	 */
 	public static QueueOptions getOptions(QueueType queueType) {
 		return new QueueOptions(DEFAULT_DELAY_SECONDS, DEFAULT_MAX_MESSAGE_SIZE, DEFALT_MESSAGE_RETENTION_PERIOD, DEFAULT_RECEIVE_MESSAGE_WAIT_TIMEOUT, DEFAULT_VISIBILITY_TIMEOUT, DEFAULT_MAX_MERGED_PRIORITY, queueType);

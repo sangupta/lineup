@@ -21,6 +21,7 @@
 
 package com.sangupta.lineup.service;
 
+import com.sangupta.lineup.LineUp;
 import com.sangupta.lineup.domain.QueueOptions;
 import com.sangupta.lineup.domain.QueueType;
 import com.sangupta.lineup.queues.DuplicateAcceptingLineUpQueue;
@@ -39,13 +40,20 @@ import com.sangupta.lineup.queues.PriorityNoDuplicateLineUpQueue;
 public class QueueGenerationFactory {
 	
 	/**
-	 * A simple factory method to get the right type of queue based on the {@link QueueOptions}
-	 * given.
+	 * A simple factory method to get the right type of queue based on the
+	 * {@link QueueOptions} given.
 	 * 
 	 * @param name
+	 *            the name of the queue
+	 * 
 	 * @param securityCode
+	 *            the security code
+	 * 
 	 * @param options
-	 * @return
+	 *            the queue options
+	 * 
+	 * @return the {@link LineUpQueue} instance
+	 * 
 	 */
 	public static LineUpQueue getLineUpQueue(String name, String securityCode, QueueOptions options) {
 		final QueueType queueType = options.getQueueType();

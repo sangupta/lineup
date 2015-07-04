@@ -103,11 +103,19 @@ public class QueueMessageWebservice {
 	}
 	
 	/**
+	 * Read from the queue the given number of messages in given poll time
 	 * 
 	 * @param queue
+	 *            the queue from where to read
+	 * 
 	 * @param numMessages
+	 *            the number of messages to read
+	 * 
 	 * @param pollTime
-	 * @return
+	 *            the time in which to return the results
+	 * 
+	 * @return the message or messages thus read, <code>null</code> if the queue
+	 *         was empty
 	 */
 	private Object getMessageFromQueue(LineUpQueue queue, int numMessages, long pollTime) {
 		if(numMessages == 1) {

@@ -47,8 +47,13 @@ public class DuplicateAcceptingLineUpQueue extends AbstractLineUpQueue {
 	 * Construct an instance of queue which can accept duplicates.
 	 * 
 	 * @param name
+	 *            the name of the queue
+	 * 
 	 * @param securityCode
+	 *            the security code
+	 * 
 	 * @param options
+	 *            the options
 	 */
 	public DuplicateAcceptingLineUpQueue(String name, String securityCode, QueueOptions options) {
 		super(name, securityCode, options);

@@ -21,8 +21,6 @@
 
 package com.sangupta.lineup.queues;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import com.sangupta.jerry.ds.ChangingPriorityQueue;
@@ -31,7 +29,7 @@ import com.sangupta.lineup.domain.QueueOptions;
 
 
 /**
- * This class extends {@link DefaultLineUpQueue} and provides extra methods
+ * This class extends {@link AbstractLineUpQueue} and provides extra methods
  * to work with messages with assigned priority levels.
  * 
  * @author sangupta
@@ -45,9 +43,16 @@ public class MergingPriorityLineUpQueue extends AbstractLineUpQueue {
 	protected final ChangingPriorityQueue<QueueMessage> internalQueue;
 	
 	/**
+	 * Construct an instance of queue which merges the priority of duplicates
+	 * 
 	 * @param name
+	 *            the name of the queue
+	 * 
 	 * @param securityCode
+	 *            the security code
+	 * 
 	 * @param options
+	 *            the queue options
 	 */
 	public MergingPriorityLineUpQueue(String name, String securityCode, QueueOptions options) {
 		super(name, securityCode, options);

@@ -65,9 +65,17 @@ public enum QueueType {
 	PriorityQueueMergingDuplicates;
 
 	/**
-	 * A method to convert 
+	 * A method to convert the string representation of queue type to an enum
+	 * instance of {@link QueueType}.
+	 * 
 	 * @param queueType
-	 * @return
+	 *            the string value of type
+	 * 
+	 * @return the enum instance, if type is correct
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if type represents an invalid value including
+	 *             <code>null</code>
 	 */
 	public static QueueType fromString(String queueType) {
 		if(AssertUtils.isEmpty(queueType)) {

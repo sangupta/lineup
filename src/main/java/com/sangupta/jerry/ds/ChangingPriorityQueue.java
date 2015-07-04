@@ -92,7 +92,7 @@ public class ChangingPriorityQueue<E extends Prioritizable> {
 	/**
 	 * Create a new queue where the maximum priority of an element is specified.
 	 * 
-	 * @param maxPriority
+	 * @param maxPriority the maximum priority a message can have
 	 */
 	@SuppressWarnings("unchecked")
 	public ChangingPriorityQueue(int maxPriority) {
@@ -112,7 +112,10 @@ public class ChangingPriorityQueue<E extends Prioritizable> {
 	 * Add the element to the queue.
 	 * 
 	 * @param element
-	 * @return
+	 *            the element to be added to the queue
+	 * 
+	 * @return <code>true</code> if the element was added, <code>false</code>
+	 *         otherwise
 	 */
 	public boolean add(E element) {
 		if(element == null) {
@@ -222,7 +225,8 @@ public class ChangingPriorityQueue<E extends Prioritizable> {
 	/**
 	 * Remove the element from the queue.
 	 * 
-	 * @return
+	 * @return the element that was removed from queue, <code>null</code> if the
+	 *         queue is empty
 	 */
 	public E poll() {
 		// check for clear() call
@@ -243,8 +247,10 @@ public class ChangingPriorityQueue<E extends Prioritizable> {
 	}
 
 	/**
+	 * Poll this queue and return an element without locking. The lock must have
+	 * been obtained by the callee.
 	 * 
-	 * @return
+	 * @return the element polled, or <code>null</code> otherwise
 	 */
 	private E pollUnlocked() {
 		do {
@@ -270,10 +276,13 @@ public class ChangingPriorityQueue<E extends Prioritizable> {
 	}
 	
 	/**
+	 * Poll and return an element from this queue with the given timeout.
 	 * 
 	 * @param timeout
+	 *            the timeout value before we return a <code>null</code>
 	 * @param timeUnit
-	 * @return
+	 *            the unit for timeout value specified
+	 * @return an element from the queue, or <code>null</code> if queue is empty
 	 */
 	public E poll(long timeout, TimeUnit timeUnit) {
 		if(timeout == 0) {
@@ -292,10 +301,12 @@ public class ChangingPriorityQueue<E extends Prioritizable> {
 	}
 	
 	/**
-	 * Remove an element from the queue.
+	 * Remove the element for the given key from the queue.
 	 * 
 	 * @param o
-	 * @return
+	 *            the key for which to delete the element
+	 * 
+	 * @return the deleted element, or <code>null</code> otherwise
 	 */
 	public E remove(Object o) {
 		Node<E> node = this.currentItems.remove(o);

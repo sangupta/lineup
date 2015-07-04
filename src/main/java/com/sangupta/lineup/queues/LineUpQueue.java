@@ -41,14 +41,14 @@ public interface LineUpQueue extends BlockingQueue<QueueMessage> {
 	/**
 	 * Return the name associated with this queue.
 	 * 
-	 * @return
+	 * @return the name of the queue
 	 */
 	public String getName();
 	
 	/**
 	 * Return the security code associated with this queue.
 	 * 
-	 * @return
+	 * @return the security code for this queue
 	 */
 	public String getSecurityCode();
 

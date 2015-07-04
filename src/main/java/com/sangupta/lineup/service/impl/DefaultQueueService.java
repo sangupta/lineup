@@ -64,8 +64,11 @@ public class DefaultQueueService implements QueueService {
 	}
 
 	/**
-	 * @throws QueueAlreadyExistsException 
-	 * @see com.sangupta.lineup.service.QueueService#createQueue(java.lang.String, com.sangupta.lineup.domain.QueueOptions)
+	 * @throws QueueAlreadyExistsException
+	 *             if the queue with same name already exists
+	 * 
+	 * @see com.sangupta.lineup.service.QueueService#createQueue(java.lang.String,
+	 *      com.sangupta.lineup.domain.QueueOptions)
 	 */
 	@Override
 	public LineUpQueue createQueue(String name, QueueOptions options) throws QueueAlreadyExistsException {
@@ -73,12 +76,21 @@ public class DefaultQueueService implements QueueService {
 	}
 	
 	/**
+	 * Create a queue with the given params
 	 * 
 	 * @param name
+	 *            the name of the queue to use
+	 * 
 	 * @param securityCode
+	 *            the security code to use
+	 * 
 	 * @param options
-	 * @return
+	 *            the {@link QueueOptions} to use
+	 * 
+	 * @return a newly created {@link LineUpQueue} instance
+	 * 
 	 * @throws QueueAlreadyExistsException
+	 *             if a queue with same name already exists
 	 */
 	public LineUpQueue createQueue(String name, String securityCode, QueueOptions options) throws QueueAlreadyExistsException {
 		if(AssertUtils.isEmpty(name)) {
@@ -116,7 +128,9 @@ public class DefaultQueueService implements QueueService {
 	}
 
 	/**
-	 * @throws QueueNotFoundException 
+	 * @throws QueueNotFoundException
+	 *             if no queue with given name is found
+	 * 
 	 * @see com.sangupta.lineup.service.QueueService#getQueueUrl(java.lang.String)
 	 */
 	@Override
@@ -152,8 +166,10 @@ public class DefaultQueueService implements QueueService {
 	}
 
 	/**
-	 * @throws QueueNotFoundException 
-	 * @see com.sangupta.lineup.service.QueueService#getQueue(java.lang.String)
+	 * @throws QueueNotFoundException
+	 *             if queue with same name and security code is not found
+	 *             
+	 * @see QueueService#getQueue(String, String)
 	 */
 	@Override
 	public LineUpQueue getQueue(String name, String securityCode) throws QueueNotFoundException {

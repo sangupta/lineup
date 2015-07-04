@@ -102,9 +102,6 @@ public abstract class AbstractLineUpQueue implements LineUpQueue {
 	 * @param options
 	 *            the options to use for this queue
 	 * 
-	 * @param internalQueue
-	 *            the internal queue implementation to use
-	 * 
 	 * @throws IllegalArgumentException
 	 *             if either the <code>name</code> or the
 	 *             <code>securityCode</code> is <code>null</code> or
@@ -210,9 +207,12 @@ public abstract class AbstractLineUpQueue implements LineUpQueue {
 	}
 	
 	/**
+	 * Add the given message to the queue
 	 * 
 	 * @param queueMessage
-	 * @return
+	 *            the message to add
+	 * 
+	 * @return the added message back
 	 */
 	public abstract QueueMessage addQueueMessage(QueueMessage queueMessage);
 	
@@ -237,10 +237,14 @@ public abstract class AbstractLineUpQueue implements LineUpQueue {
 	}
 	
 	/**
+	 * Return a message from the queue polling for the given time.
 	 * 
 	 * @param longPollTime
-	 * @return
+	 *            the poll time to wait before returning a <code>null</code>
+	 * @return {@link QueueMessage} as read, <code>null</code> otherwise
+	 * 
 	 * @throws InterruptedException
+	 *             if something interrupted this thread before poll time elapsed
 	 */
 	@Override
 	public final QueueMessage getMessage(long longPollTime) throws InterruptedException {
@@ -253,10 +257,14 @@ public abstract class AbstractLineUpQueue implements LineUpQueue {
 	}
 	
 	/**
+	 * Return a message from the queue polling for the given time.
 	 * 
 	 * @param longPollTime
-	 * @return
+	 *            the poll time to wait before returning a <code>null</code>
+	 * @return {@link QueueMessage} as read, <code>null</code> otherwise
+	 * 
 	 * @throws InterruptedException
+	 *             if something interrupted this thread before poll time elapsed
 	 */
 	protected abstract QueueMessage getQueueMessage(long longPollTime) throws InterruptedException;
 	
@@ -281,8 +289,10 @@ public abstract class AbstractLineUpQueue implements LineUpQueue {
 	}
 	
 	/**
+	 * Returns the number of messages in the queue
 	 * 
-	 * @return
+	 * @return the number of messages
+	 * 
 	 */
 	@Override
 	public final int numMessages() {
@@ -312,7 +322,10 @@ public abstract class AbstractLineUpQueue implements LineUpQueue {
 	 * Remove the message identified by the given message id.
 	 * 
 	 * @param id
-	 * @return
+	 *            the message identifier to remove
+	 * 
+	 * @return <code>true</code> if message was removed, <code>false</code>
+	 *         otherwise
 	 */
 	public abstract boolean removeMessageID(long id);
 
@@ -395,7 +408,8 @@ public abstract class AbstractLineUpQueue implements LineUpQueue {
 	}
 
 	/**
-	 * @see java.util.Collection#toArray(T[])
+	 * Method not supported.
+	 * 
 	 */
 	@Override
 	public <T> T[] toArray(T[] a) {

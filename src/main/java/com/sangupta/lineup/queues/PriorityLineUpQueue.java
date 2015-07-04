@@ -30,7 +30,7 @@ import com.sangupta.lineup.domain.QueueOptions;
 
 
 /**
- * This class extends {@link DefaultLineUpQueue} and provides extra methods
+ * This class extends {@link AbstractLineUpQueue} and provides extra methods
  * to work with messages with assigned priority levels.
  * 
  * @author sangupta
@@ -44,9 +44,16 @@ public class PriorityLineUpQueue extends AbstractLineUpQueue {
 	protected final BlockingQueue<QueueMessage> internalQueue;
 	
 	/**
+	 * Construct an instance of queue which has priority for each message
+	 * 
 	 * @param name
+	 *            the name of the queue
+	 * 
 	 * @param securityCode
+	 *            the security code
+	 * 
 	 * @param options
+	 *            the queue options
 	 */
 	public PriorityLineUpQueue(String name, String securityCode, QueueOptions options) {
 		super(name, securityCode, options);

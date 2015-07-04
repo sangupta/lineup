@@ -31,7 +31,7 @@ import com.sangupta.lineup.domain.QueueOptions;
 
 
 /**
- * This class extends {@link DefaultLineUpQueue} and provides extra methods
+ * This class extends {@link AbstractLineUpQueue} and provides extra methods
  * to work with messages with assigned priority levels.
  * 
  * @author sangupta
@@ -50,9 +50,16 @@ public class PriorityNoDuplicateLineUpQueue extends AbstractLineUpQueue {
 	protected final ConcurrentSkipListSet<String> currentMessages;
 	
 	/**
+	 * Construct an instance of queue which rejects duplicates in a priority queue
+	 * 
 	 * @param name
+	 *            the name of the queue
+	 * 
 	 * @param securityCode
+	 *            the security code
+	 * 
 	 * @param options
+	 *            the queue options
 	 */
 	public PriorityNoDuplicateLineUpQueue(String name, String securityCode, QueueOptions options) {
 		super(name, securityCode, options);

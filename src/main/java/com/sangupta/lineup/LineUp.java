@@ -64,9 +64,10 @@ public class LineUp {
      * 
      * @param args the arguments from the command line.
      * 
-     * @throws IOException
+     * @throws IOException if something fails
      *  
-     * @throws IllegalArgumentException 
+     * @throws IllegalArgumentException if something failes
+     * 
      */
     public static void main(String[] args) throws IllegalArgumentException, IOException {
 		if(lineUpServer != null) {
@@ -95,21 +96,25 @@ public class LineUp {
 	}
     
     /**
-     * Return the default instance of the queue service.
-     * 
-     * @return
-     */
+	 * Return the default instance of the queue service.
+	 * 
+	 * @return the default instance of {@link QueueService}
+	 */
     public static QueueService getDefaultQueueService() {
     	return QUEUE_SERVICE;
     }
     
 	/**
-	 * Get a new queue with default options or retrieve an existing queue
-	 * with whatever options that were provided.
+	 * Get a new queue with default options or retrieve an existing queue with
+	 * whatever options that were provided.
 	 * 
 	 * @param name
-	 * @return
-	 * @throws QueueAlreadyExistsException 
+	 *            the name of the queue to use
+	 * 
+	 * @return the {@link LineUpQueue} instance thus created
+	 * 
+	 * @throws QueueAlreadyExistsException
+	 *             if a queue with same name already exists
 	 */
 	public static LineUpQueue createMessageQueue(String name) throws QueueAlreadyExistsException {
 		return QUEUE_SERVICE.createQueue(name);
@@ -119,9 +124,15 @@ public class LineUp {
 	 * Get a new queue with default options with the given security code.
 	 * 
 	 * @param name
+	 *            the name of the queue to use
+	 * 
 	 * @param securityCode
-	 * @return
+	 *            the security code to use
+	 * 
+	 * @return the newly created instance of {@link LineUpQueue}
+	 * 
 	 * @throws QueueAlreadyExistsException
+	 *             if a queue with same name already exists
 	 */
 	public static LineUpQueue createMessageQueue(String name, String securityCode) throws QueueAlreadyExistsException {
 		return QUEUE_SERVICE.createQueue(name, securityCode);
@@ -131,9 +142,15 @@ public class LineUp {
 	 * Get a new queue with default options but of the given type.
 	 * 
 	 * @param name
+	 *            the name of the queue to use
+	 * 
 	 * @param queueType
-	 * @return
+	 *            the type of the queue to create
+	 * 
+	 * @return the newly created {@link LineUpQueue} instance
+	 * 
 	 * @throws QueueAlreadyExistsException
+	 *             if a queue with same name already exists
 	 */
 	public static LineUpQueue createMessageQueue(String name, QueueType queueType) throws QueueAlreadyExistsException {
 		return QUEUE_SERVICE.createQueue(name, QueueOptions.getOptions(queueType));
@@ -143,10 +160,18 @@ public class LineUp {
 	 * Get a new queue with default options but of the given type.
 	 * 
 	 * @param name
+	 *            the name of the queue to use
+	 * 
 	 * @param securityCode
+	 *            the security code to use
+	 * 
 	 * @param queueType
-	 * @return
+	 *            the type of the queue to create
+	 * 
+	 * @return the newly created {@link LineUpQueue} instance
+	 * 
 	 * @throws QueueAlreadyExistsException
+	 *             if a queue with same name already exists
 	 */
 	public static LineUpQueue createMessageQueue(String name, String securityCode, QueueType queueType) throws QueueAlreadyExistsException {
 		return QUEUE_SERVICE.createQueue(name, securityCode, QueueOptions.getOptions(queueType));
@@ -156,22 +181,36 @@ public class LineUp {
 	 * Get a new queue with default options but of the given type.
 	 * 
 	 * @param name
+	 *            the name of the queue to use
 	 * @param securityCode
+	 *            the security code to use
+	 * 
 	 * @param queueOptions
-	 * @return
+	 *            the queue options to use to create the queue
+	 * 
+	 * @return the newly created {@link LineUpQueue} instance
+	 * 
 	 * @throws QueueAlreadyExistsException
+	 *             if a queue with same name already exists
 	 */
 	public static LineUpQueue createMessageQueue(String name, String securityCode, QueueOptions queueOptions) throws QueueAlreadyExistsException {
 		return QUEUE_SERVICE.createQueue(name, securityCode, queueOptions);
 	}
 	
 	/**
-	 * Retrieve a queue with the given name and security code. The queue MUST be pre-created.
+	 * Retrieve a queue with the given name and security code. The queue MUST be
+	 * pre-created.
 	 * 
 	 * @param name
+	 *            the name of the queue
+	 * 
 	 * @param securityCode
-	 * @return
+	 *            the matching security code for queue
+	 * 
+	 * @return the found {@link LineUpQueue} instance, if any
+	 * 
 	 * @throws QueueNotFoundException
+	 *             if no queue with same name and matching security code exists
 	 */
 	public static LineUpQueue getQueue(String name, String securityCode) throws QueueNotFoundException {
 		return QUEUE_SERVICE.getQueue(name, securityCode);
@@ -181,8 +220,13 @@ public class LineUp {
 	 * Delete a queue with the given name.
 	 * 
 	 * @param name
-	 * @return
-	 * @throws QueueAlreadyDeletedException 
+	 *            the name of the queue to remove
+	 * 
+	 * @return <code>true</code> if queue was deleted successfully,
+	 *         <code>false</code> otherwise
+	 * 
+	 * @throws QueueAlreadyDeletedException
+	 *             if queue was already deleted as a previous operation
 	 */
 	public static boolean deleteMessageQueue(String name) throws QueueAlreadyDeletedException {
 		return QUEUE_SERVICE.deleteQueue(name);
@@ -192,7 +236,9 @@ public class LineUp {
 	 * Create a remote queue for the queue URL.
 	 * 
 	 * @param queueURL
-	 * @return
+	 *            the URL of the remote queue server
+	 * 
+	 * @return the {@link LineUpQueue} instance connected to the queue server
 	 */
 	public static LineUpQueue createRemoteQueue(final String queueURL) {
 		return new RemoteLineUpQueue(queueURL);
@@ -202,8 +248,12 @@ public class LineUp {
 	 * Create a remote queue at the given server address and queue name.
 	 * 
 	 * @param lineUpServer
+	 *            the URL of the remote queue server
+	 * 
 	 * @param queueName
-	 * @return
+	 *            the name of the queue to create
+	 * 
+	 * @return the {@link LineUpQueue} instance connected to the queue server
 	 */
 	public static LineUpQueue createRemoteQueue(final String lineUpServer, final String queueName) {
 		return new RemoteLineUpQueue(lineUpServer, queueName);
@@ -213,37 +263,57 @@ public class LineUp {
 	 * Create a remote queue at the given server address and queue name.
 	 * 
 	 * @param lineUpServer
+	 *            the URL of the remote queue server
+	 * 
 	 * @param queueName
+	 *            the name of the queue
+	 * 
 	 * @param queueType
-	 * @return
+	 *            the type of the queue
+	 * 
+	 * @return the {@link LineUpQueue} instance connected to the queue server
 	 */
 	public static LineUpQueue createRemoteQueue(final String lineUpServer, final String queueName, final QueueType queueType) {
 		return new RemoteLineUpQueue(lineUpServer, queueName, QueueOptions.getOptions(queueType));
 	}
 	
 	/**
-	 * Connect to an existing code at the given server address, and queue name with
-	 * the given security code.
-	 *  
+	 * Connect to an existing code at the given server address, and queue name
+	 * with the given security code.
+	 * 
 	 * @param lineUpServer
+	 *            the URL of the remote queue server
+	 * 
 	 * @param queueName
+	 *            the name of the queue
+	 * 
 	 * @param securityCode
-	 * @return
+	 *            the security code to use
+	 * 
+	 * @return the {@link LineUpQueue} instance connected to the queue server
 	 */
 	public static LineUpQueue connectRemote(final String lineUpServer, final String queueName, final String securityCode) {
 		return new RemoteLineUpQueue(lineUpServer, queueName, securityCode);
 	}
 	
 	/**
-	 * Connect to an existing code at the given server address, and queue name with
-	 * the given security code. The given default poll time will be used when polling
-	 * the queue for messages.
+	 * Connect to an existing code at the given server address, and queue name
+	 * with the given security code. The given default poll time will be used
+	 * when polling the queue for messages.
 	 * 
 	 * @param lineUpServer
+	 *            the URL of the remote queue server
+	 * 
 	 * @param queueName
+	 *            the name of the queue
+	 * 
 	 * @param securityCode
-	 * @param pollTime
-	 * @return
+	 *            the security code to use
+	 * 
+	 * @param defaultPollTime
+	 *            the default value of poll time
+	 * 
+	 * @return the {@link LineUpQueue} instance connected to the queue server
 	 */
 	public static LineUpQueue connectRemote(final String lineUpServer, final String queueName, final String securityCode, long defaultPollTime) {
 		return new RemoteLineUpQueue(lineUpServer, queueName, securityCode, defaultPollTime);
